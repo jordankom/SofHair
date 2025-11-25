@@ -1,0 +1,59 @@
+# ─────────────────────────────
+#   NODE / TYPESCRIPT BACKEND
+# ─────────────────────────────
+
+# Node modules
+node_modules/
+
+# Builds
+dist/
+build/
+out/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.development
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database dumps
+*.sql
+*.sqlite
+*.db
+dump.rdb
+mongod.lock
+data/
+db/
+
+# Temporary files
+.tmp/
+temp/
+tmp/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# PM2 logs
+.pids
+*.pid
+*.seed
+*.pid.lock
+
+# Editor backups
+*~
+*.swp
