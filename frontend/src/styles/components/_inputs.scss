@@ -1,0 +1,33 @@
+@use '../variables' as *;
+
+.ui-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+
+  &__label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: $color-text-main;
+  }
+
+  &__field {
+    border-radius: $radius-sm;
+    border: 1px solid $color-border;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.95rem;
+    outline: none;
+    background: #fff;
+
+    &:focus {
+      border-color: $color-primary;
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.1);
+    }
+  }
+
+  &__error {
+    font-size: 0.8rem;
+    color: $color-error;
+  }
+}

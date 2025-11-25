@@ -1,0 +1,58 @@
+@use '../variables' as *;
+
+.ui-button {
+  border: none;
+  border-radius: $radius-md;
+  padding: 0.7rem 1.4rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+
+  &--full {
+    width: 100%;
+  }
+
+  &--primary {
+    background: $color-primary;
+    color: #fff;
+
+    &:hover {
+      background: #020617;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.3);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+  }
+
+  &--secondary {
+    background: #fff;
+    color: $color-primary;
+    border: 1px solid $color-border;
+
+    &:hover {
+      background: $color-primary-soft;
+    }
+  }
+
+  &--ghost {
+    background: transparent;
+    color: $color-primary;
+    border: none;
+
+    &:hover {
+      background: rgba(15, 23, 42, 0.04);
+    }
+  }
+}

@@ -1,0 +1,19 @@
+// src/styles/_mixins.scss
+
+@use './variables' as *;
+
+// Media query mixin pour les écrans moyens
+
+@mixin respond-md {
+  @media (max-width: $breakpoint-md) {
+    @content;
+  }
+}
+
+// Media query mixin pour les petits écrans
+
+@mixin respond-sm {
+  @media (max-width: $breakpoint-sm) {
+    @content;
+  }
+}
