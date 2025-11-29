@@ -5,6 +5,8 @@ import app from './app';
 import { connectDB } from './config/db';
 import env from './config/env';
 import { logError, logInfo } from './utils/logger';
+import cors from 'cors';
+import routes from './routes';
 
 async function startServer(): Promise<void> {
     try {

@@ -1,11 +1,13 @@
-// Routes pour l'authentification : /api/Auth/...
+// BACKEND
+// Route d'authentification : /api/auth/login
 
 import { Router } from 'express';
-import { register, login } from '../controllers/auth.controller';
+import { login, register } from '../controllers/auth.controller';
 
 const router = Router();
 
-router.post('/register', register);
+// POST /api/auth/login
 router.post('/login', login);
+router.post('/register', register);
 
 export default router;

@@ -1,52 +1,99 @@
-// AuthContext.tsx
-// Contexte global pour gérer l'état d'authentification côté front.
-// Pour l'instant :
-// - on simule un "user" en mémoire
-// - plus tard, on branchera ça sur l'API de login / JWT.
+// FRONTEND
+// Contexte d'authentification pour le front.
+// Il stocke :
+// - le user (id, email, role)
+// - le token JWT
+// - les fonctions login/logout
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+// ⬇️ Import par défaut conseillé avec jwt-decode
+import {jwtDecode} from 'jwt-decode';
 
-type UserRole = 'client' | 'owner';
+// Type de rôle possible
+export type UserRole = 'client' | 'owner';
 
+// Format du token décodé
+interface DecodedToken {
+    sub: string;
+    role: UserRole;
+    exp: number;
+    iat: number;
+}
+
+// ✅ On exporte bien AuthUser en "named export"
 export interface AuthUser {
     id: string;
     email: string;
     role: UserRole;
 }
 
+// Format des données exposées par le contexte
 interface AuthContextValue {
     user: AuthUser | null;
-    login: (user: AuthUser) => void;
+    token: string | null;
+    login: (token: string, user: AuthUser) => void;
     logout: () => void;
 }
 
+// Création du contexte (nullable au départ)
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
+// Provider global qui entoure toute l'app
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    // État local : utilisateur connecté ou non
     const [user, setUser] = useState<AuthUser | null>(null);
+    const [token, setToken] = useState<string | null>(null);
 
-    // Fonction pour "connecter" un utilisateur (simulé pour l'instant)
-    const login = (u: AuthUser) => {
-        setUser(u);
-        // Plus tard : enregistrer le token dans localStorage ici
+    // Au chargement, on regarde s'il y a un token dans le localStorage
+    useEffect(() => {
+        const storedToken = localStorage.getItem('auth_token');
+        const storedUser = localStorage.getItem('auth_user');
+
+        if (storedToken && storedUser) {
+            try {
+                const decoded = jwtDecode<DecodedToken>(storedToken);
+
+                // Si le token est expiré, on nettoie
+                if (decoded.exp * 1000 < Date.now()) {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('auth_user');
+                    return;
+                }
+
+                setToken(storedToken);
+                setUser(JSON.parse(storedUser));
+            } catch (e) {
+                // Token invalide → on nettoie
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('auth_user');
+            }
+        }
+    }, []);
+
+    // Fonction appelée après un login ou un register réussi
+    const login = (jwt: string, userData: AuthUser) => {
+        setToken(jwt);
+        setUser(userData);
+        localStorage.setItem('auth_token', jwt);
+        localStorage.setItem('auth_user', JSON.stringify(userData));
     };
 
-    // Fonction pour se déconnecter
+    // Déconnexion
     const logout = () => {
+        setToken(null);
         setUser(null);
-        // Plus tard : supprimer le token du localStorage
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_user');
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider value={{ user, token, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
-// Hook pratique pour utiliser le contexte
-export const useAuth = () => {
+// Hook pour consommer facilement le contexte
+export const useAuth = (): AuthContextValue => {
     const ctx = useContext(AuthContext);
     if (!ctx) {
         throw new Error('useAuth doit être utilisé dans un AuthProvider');

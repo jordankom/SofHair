@@ -28,7 +28,7 @@
 
 .landing-hero {
   position: relative;
-  // On prend toute la hauteur de la fenêtre (un peu moins si tu veux)
+  // On prend toute la hauteur de la fenêtre
   min-height: calc(100vh - 64px); // 64px ≈ hauteur de la navbar
   display: flex;
   align-items: center;

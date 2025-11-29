@@ -11,7 +11,7 @@
 import React from 'react';
 import Card from '../../components/ui/Card';
 import AuthLayout from '../../components/layout/AuthLayout';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext.tsx';
 
 interface Appointment {
     date: string;

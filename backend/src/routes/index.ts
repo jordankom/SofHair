@@ -1,15 +1,12 @@
-// Point d'entrée regroupant toutes les routes de l'API
-// /api/Auth, /api/users, /api/appointments, etc.
+// BACKEND
+// Fichier qui centralise les routes de l'API.
 
 import { Router } from 'express';
 import authRoutes from './auth.routes';
 
 const router = Router();
 
-router.use('/Auth', authRoutes);
-
-// TODO : plus tard :
-// router.use('/coiffures', coiffureRoutes);
-// router.use('/rendezvous', rendezVousRoutes);
+// Préfixe /api/auth pour toutes les routes d'auth
+router.use('/auth', authRoutes);
 
 export default router;

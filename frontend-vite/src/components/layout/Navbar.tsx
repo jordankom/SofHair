@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import '../../styles/components/_navbar.scss';
 import Button from '../ui/Button';
 import AuthPrompt from '../ui/AuthPrompt';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext.tsx';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -19,11 +19,10 @@ const Navbar: React.FC = () => {
 
     const handleBookClick = () => {
         if (!user) {
-            // Si pas connecté → montrer la popup
-            navigate('/client');
-            //setShowPrompt(true);
+            navigate('/login');
+        } else if (user.role === 'owner') {
+            navigate('/owner');
         } else {
-            // Plus tard : page de prise de RDV ou tableau de bord
             navigate('/client');
         }
     };
