@@ -18,7 +18,7 @@ const RequireAuth: React.FC<RequireAuthProps> = ({ children, allowedRoles }) => 
 
     // Pas connecté → on renvoie vers /login
     if (!user) {
-        return <Navigate to="/login" state={{ from: location }} replace />;
+        return <Navigate to="/" state={{ from: location }} replace />;
     }
 
     // Si des rôles sont spécifiés, on vérifie que l'utilisateur est autorisé

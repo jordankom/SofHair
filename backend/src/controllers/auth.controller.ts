@@ -31,26 +31,22 @@ export async function login(req: Request, res: Response) {
 
 export async function register(req: Request, res: Response) {
     try {
-        const { email, password, confirmPassword, firstName, lastName } = req.body;
+        // On récupère AUSSI le rôle depuis le body
+        const { email, password, firstName, lastName, role } = req.body;
 
-        // Vérifications de base
-        if (!email || !password || !confirmPassword) {
-            return res.status(400).json({ message: 'Email et mot de passe sont requis.' });
-        }
+        //  Et on le transmet au service
+        const result = await registerUser({
+            email,
+            password,
+            firstName,
+            lastName,
+            role,
+        });
 
-        if (password !== confirmPassword) {
-            return res.status(400).json({ message: 'Les mots de passe ne correspondent pas.' });
-        }
-
-        const result = await registerUser({ email, password, firstName, lastName });
-
-        return res.status(201).json(result);
+        res.status(201).json(result);
     } catch (error: any) {
-        if (error.message === 'EMAIL_ALREADY_USED') {
-            return res.status(409).json({ message: 'Cet email est déjà utilisé.' });
-        }
-
         console.error('[AUTH] Erreur register :', error);
-        return res.status(500).json({ message: 'Erreur interne du serveur.' });
+        res.status(400).json({ message: error.message || 'Erreur lors de la création du compte' });
     }
 }
+

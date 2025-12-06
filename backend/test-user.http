@@ -1,0 +1,17 @@
+### GET request to example server
+GET https://examples.http-client.intellij.net/get
+    ?generated-in=WebStorm
+
+### Créer un utilisateur owner
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "fred@softhair.com",
+  "password": "password123",
+  "confirmPassword": "password123",
+  "firstName": "fred",
+  "lastName": "Bree",
+  "role": "owner"
+}
+

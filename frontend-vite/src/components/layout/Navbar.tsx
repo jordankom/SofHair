@@ -1,31 +1,54 @@
 // FRONTEND
 // ─────────────────────────────────────────────────────────
 // Navbar du site client
-// Ajout du popup AuthPrompt si l'utilisateur n'est pas connecté
+// - Affiche le nom de l'utilisateur connecté
+// - Gère la redirection selon le rôle
+// - Ouvre le AuthPrompt si non connecté
+// - Déconnexion → retour à la landing (/)
 // ─────────────────────────────────────────────────────────
 
 import React, { useState } from 'react';
 import '../../styles/components/_navbar.scss';
 import Button from '../ui/Button';
 import AuthPrompt from '../ui/AuthPrompt';
-import { useAuth } from '../../context/AuthContext.tsx';
+import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-
 
 const Navbar: React.FC = () => {
     const [showPrompt, setShowPrompt] = useState(false);
-    const { user } = useAuth();   // user = null → pas connecté
+
+    // user = null → pas connecté
+    // logout() → vide le contexte + localStorage
+    const { user, logout } = useAuth();
+
     const navigate = useNavigate();
 
+    // Gestion du bouton "Prendre RDV / Connexion"
     const handleBookClick = () => {
         if (!user) {
-            navigate('/login');
+            //  Pas connecté → on ouvre la popup (connexion / inscription)
+            setShowPrompt(true);
         } else if (user.role === 'owner') {
+            // Propriétaire → dashboard owner
             navigate('/owner');
         } else {
+            // Client → dashboard client
             navigate('/client');
         }
     };
+
+    // Gestion de la déconnexion
+    const handleLogout = () => {
+        // 1️⃣ On sort d'abord de la page protégée (/client ou /owner)
+        navigate('/');
+
+        // 2️⃣ Puis on nettoie l'auth dans le "tick" suivant
+        setTimeout(() => {
+            logout();
+        }, 0);
+    };
+
+
 
     return (
         <>
@@ -45,16 +68,36 @@ const Navbar: React.FC = () => {
                         <a href="#localisation" className="navbar__link">Localisation</a>
                     </nav>
 
-                    {/* Bouton Prendre RDV */}
+                    {/* Zone droite : utilisateur / bouton */}
                     <div className="navbar__cta">
-                        <Button variant="secondary" onClick={handleBookClick}>
-                            Prendre RDV
-                        </Button>
+                        {user ? (
+                            <>
+                                {/*  Affichage du NOM */}
+                                <span className="navbar__user-name">
+                                    Bonjour,&nbsp;
+                                    <strong>
+                                        {user.firstName || user.lastName || user.email}
+                                    </strong>
+                                </span>
+
+                                <Button
+                                    variant="secondary"
+                                    onClick={handleLogout}
+                                >
+                                    Déconnexion
+                                </Button>
+                            </>
+                        ) : (
+                            <Button variant="secondary" onClick={handleBookClick}>
+                                Prendre un rendez-vous
+                            </Button>
+                        )}
                     </div>
+
                 </div>
             </header>
 
-            {/* Popup connexion */}
+            {/* Popup connexion / inscription */}
             {showPrompt && (
                 <AuthPrompt onClose={() => setShowPrompt(false)} />
             )}

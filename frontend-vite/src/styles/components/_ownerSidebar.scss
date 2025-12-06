@@ -1,0 +1,157 @@
+// src/styles/components/_ownerSidebar.scss
+
+// On importe les variables globales (couleurs, rayons, etc.)
+@use '../variables' as *;
+// On importe les mixins (respond-md, respond-sm, ...)
+@use '../mixins' as *;
+
+// FRONTEND
+// Styles de la barre latérale propriétaire (SoftHair Owner Dashboard)
+
+.owner-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 240px;
+
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1.25rem;
+
+  // On utilise la palette bleu/noir définie dans _variables.scss
+  background: radial-gradient(circle at top left, $color-primary-soft 0, $color-bg 40%, #000000 100%);
+  color: $color-text-main;
+
+  border-right: 1px solid rgba(148, 163, 184, 0.4);
+  box-shadow: 12px 0 40px rgba(15, 23, 42, 0.7);
+}
+
+/* Header / logo */
+
+.owner-sidebar__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.owner-sidebar__logo-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 30%, #22c55e 0, #16a34a 40%, #052e16 100%);
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.9);
+}
+
+.owner-sidebar__brand-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: $color-text-main;
+}
+
+.owner-sidebar__brand-subtitle {
+  font-size: 0.75rem;
+  color: $color-text-muted;
+}
+
+/* Navigation */
+
+.owner-sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.owner-sidebar__nav--main {
+  flex: 1;
+}
+
+.owner-sidebar__nav--bottom {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+/* Items */
+
+.owner-sidebar__item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.75rem;
+  font-size: 0.9rem;
+
+  color: #cbd5f5; // on peut garder cette teinte spécifique
+  text-decoration: none;
+
+  transition: background 0.16s ease, color 0.16s ease, transform 0.12s ease;
+}
+
+.owner-sidebar__item:hover {
+  background: linear-gradient(
+                  90deg,
+                  rgba(59, 130, 246, 0.4),
+                  rgba(168, 85, 247, 0.2)
+  );
+  color: $color-text-main;
+  transform: translateX(2px);
+}
+
+/* Item actif */
+
+.owner-sidebar__item--active {
+  background: linear-gradient(
+                  90deg,
+                  #3b82f6,
+                  #6366f1
+  );
+  color: $color-text-main;
+  box-shadow: 0 0 24px rgba(59, 130, 246, 0.7);
+}
+
+.owner-sidebar__icon {
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.owner-sidebar__label {
+  white-space: nowrap;
+}
+
+/* Responsive : sur petit écran, on réduit la sidebar
+   On utilise le mixin respond-md qui se base sur $breakpoint-md (900px)
+*/
+
+@include respond-md {
+  .owner-sidebar {
+    width: 72px;
+    padding: 1.25rem 0.6rem;
+    align-items: center;
+  }
+
+  .owner-sidebar__header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .owner-sidebar__brand-title,
+  .owner-sidebar__brand-subtitle {
+    display: none; // on masque le texte, on garde juste le dot
+  }
+
+  .owner-sidebar__item {
+    justify-content: center;
+  }
+
+  .owner-sidebar__label {
+    display: none; // uniquement les icônes sur mobile / petit écran
+  }
+
+  .owner-sidebar__nav--bottom {
+    width: 100%;
+  }
+}

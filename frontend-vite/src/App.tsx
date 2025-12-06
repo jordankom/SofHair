@@ -12,6 +12,7 @@ import LoginPage from './pages/Auth/LoginPage';
 import ClientDashboardPage from './pages/Client/ClientDashboardPage';
 import RequireAuth from './components/routing/RequireAuth';
 import RegisterPage from './pages/Auth/RegisterPage';
+import OwnerDashboardPage from "./pages/Owner/OwnerDashboardPage.tsx";
 
 const App: React.FC = () => {
     return (
@@ -33,11 +34,12 @@ const App: React.FC = () => {
             />
 
             {/* Espace propriétaire (admin salon) */}
+
             <Route
                 path="/owner"
                 element={
                     <RequireAuth allowedRoles={['owner']}>
-                        <div>Dashboard propriétaire (à faire)</div>
+                        <OwnerDashboardPage />
                     </RequireAuth>
                 }
             />

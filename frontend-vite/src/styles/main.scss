@@ -1,30 +1,20 @@
-// src/styles/_variables.scss
+// src/styles/main.scss
+// Fichier racine des styles : on importe tout ici.
 
-// 🎨 PALETTE BLEU + NOIR
+// Variables globales (couleurs, rayons, breakpoints)
+@use './variables';
 
-// Couleur de fond principale (page)
-$color-bg: #020617;            // presque noir (gris très foncé)
-// Couleur de texte principale
-$color-text-main: #f9fafb;     // blanc cassé
-// Texte secondaire
-$color-text-muted: #9ca3af;    // gris doux
+// Mixins globaux
+@use './mixins';
 
-// Couleur principale (boutons, liens)
-$color-primary: #1d4ed8;       // bleu
-$color-primary-soft: #1e293b;  // bleu très foncé / gris bleuté
+// Composants
+@use './components/ownerSidebar';
 
-// Bordures / traits
-$color-border: #111827;
+// Pages
+@use './pages/ownerDashboard';
 
-// Erreurs
-$color-error: #f97373;
-
-// Rayons & ombres
-$radius-lg: 24px;
-$radius-md: 12px;
-$radius-sm: 8px;
-
-$shadow-soft: 0 24px 60px rgba(15, 23, 42, 0.5);
-
-$breakpoint-md: 900px;
-$breakpoint-sm: 600px;
+// Plus tard, tu ajouteras ici :
+ //@use './components/navbar';
+ //@use './pages/auth';
+// @use './pages/landing';
+// etc.

@@ -5,7 +5,7 @@
 
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { UserModel, IUser } from '../models/user.model';
+import {UserModel, IUser, UserRole} from '../models/user.model';
 import  env  from '../config/env'; // fichier qui lit process.env
 
 export interface RegisterPayload {
@@ -13,6 +13,7 @@ export interface RegisterPayload {
     password: string;
     firstName?: string;
     lastName?: string;
+    role?: UserRole; // optionnel : 'client' | 'owner'
 }
 
 export interface LoginResult {
@@ -64,7 +65,7 @@ export async function loginUser(email: string, password: string): Promise<LoginR
 }
 
 export async function registerUser(payload: RegisterPayload) {
-    const { email, password, firstName, lastName } = payload;
+    const { email, password, firstName, lastName, role } = payload;
 
     // Vérifier si l'email existe déjà
     const existing = await UserModel.findOne({ email });
@@ -75,16 +76,17 @@ export async function registerUser(payload: RegisterPayload) {
     // Hasher le mot de passe
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // On crée un utilisateur avec rôle 'client'
+    // ✅ On choisit le rôle : owner OU client (client par défaut)
+    const userRole: UserRole = role === 'owner' ? 'owner' : 'client';
+
     const user = await UserModel.create({
         email,
         passwordHash,
         firstName,
         lastName,
-        role: 'client' // 🔵 ici on force le rôle client pour le register public
+        role: userRole
     });
 
-    // Génération du token, même logique que login
     const token = jwt.sign(
         {
             sub: user._id.toString(),
@@ -105,4 +107,5 @@ export async function registerUser(payload: RegisterPayload) {
         }
     };
 }
+
 

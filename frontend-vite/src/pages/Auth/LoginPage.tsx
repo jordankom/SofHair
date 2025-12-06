@@ -28,7 +28,8 @@ const LoginPage: React.FC = () => {
     const location = useLocation();
 
     // Si on vient d'une route protégée, on voudra renvoyer l'utilisateur là-bas
-    const from = (location.state as any)?.from?.pathname || '/client';
+    const state = location.state as { from?: string } | undefined;
+    const from = state?.from || '/client';
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
