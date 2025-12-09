@@ -1,0 +1,144 @@
+// _auth.scss
+// Styles pour la page d'accueil SoftHair :
+// - Hero plein écran avec image de fond et texte centré
+// - Section contenu à fond blanc en dessous, avec blocs correspondant aux onglets
+
+@use '../variables' as *;
+@use '../mixins' as m;
+
+// Conteneur général du layout
+.auth-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+// Zone principale sous la navbar
+.auth-layout__main {
+  flex: 1;
+}
+
+// Conteneur global de la page d'accueil
+.landing {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- HERO PLEIN ÉCRAN AVEC IMAGE ---------- */
+
+.landing-hero {
+  position: relative;
+  // On prend toute la hauteur de la fenêtre
+  min-height: calc(100vh - 64px); // 64px ≈ hauteur de la navbar
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+// Calque qui gère l'image de fond
+.landing-hero__background {
+  position: absolute;
+  inset: 0;
+  background-image: url('../../images/salon-hero.jpg'); // image
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+}
+
+// Contenu centré au milieu du hero
+.landing-hero__content {
+  position: relative;
+  z-index: 1; // on passe devant l'image
+  text-align: center;
+  max-width: 720px;
+  padding: 2rem 1.5rem;
+
+  // Fond légèrement dégradé pour bien lire le texte sur l'image
+  background: radial-gradient(
+                  circle at center,
+                  rgba(249, 250, 251, 0.96) 0%,
+                  rgba(249, 250, 251, 0.9) 50%,
+                  rgba(249, 250, 251, 0.6) 100%
+  );
+  border-radius: 24px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.35);
+
+  @include m.respond-sm {
+    padding: 1.5rem 1.25rem;
+  }
+}
+
+.landing-hero__eyebrow {
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: $color-text-muted;
+  margin-bottom: 0.75rem;
+}
+
+.landing-hero__title {
+  font-size: 2.6rem;
+  line-height: 1.1;
+  margin: 0 0 1rem;
+  color: $color-text-main;
+
+  @include m.respond-sm {
+    font-size: 2rem;
+  }
+}
+
+.landing-hero__subtitle {
+  font-size: 1rem;
+  color: $color-text-muted;
+  max-width: 36rem;
+  margin: 0 auto;
+}
+
+/* ---------- SECTION CONTENU BLANC ---------- */
+
+.landing-content {
+  // Fond blanc uni, sans image
+  background: #ffffff;
+  padding: 3rem 1.5rem 4rem;
+
+  @include m.respond-md {
+    padding-inline: 1rem;
+    padding-block: 2.5rem;
+  }
+}
+
+// Conteneur interne centré pour les cartes
+.landing-content__inner {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+// Chaque section correspond à un onglet (services, coiffeurs, etc.)
+.landing-section {
+  scroll-margin-top: 80px; // pour le scroll par ancre avec la navbar
+}
+
+.landing-section__card {
+  // .ui-card fournit déjà fond, radius, ombre
+}
+
+.landing-section__title {
+  font-size: 1.2rem;
+  margin: 0 0 0.75rem;
+  color: $color-text-main;
+}
+
+.landing-section__text {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: $color-text-muted;
+
+  &:not(:last-child) {
+    margin-bottom: 0.5rem;
+  }
+}

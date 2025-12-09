@@ -39,10 +39,10 @@ const Navbar: React.FC = () => {
 
     // Gestion de la déconnexion
     const handleLogout = () => {
-        // 1️⃣ On sort d'abord de la page protégée (/client ou /owner)
+        // On sort d'abord de la page protégée (/client ou /owner)
         navigate('/');
 
-        // 2️⃣ Puis on nettoie l'auth dans le "tick" suivant
+        // Puis on nettoie l'auth dans le "tick" suivant
         setTimeout(() => {
             logout();
         }, 0);

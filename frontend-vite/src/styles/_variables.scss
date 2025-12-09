@@ -1,31 +1,40 @@
-// 🎨 PALETTE BLEU + NOIR
+// FRONTEND - src/styles/_variables.scss
+// 🎨 Palette SoftHair - Dashboard type "Devias" (bleu / violet / cartes blanches)
 
-// Couleur de fond principale (page)
-$color-bg: #020617;            // presque noir (gris très foncé)
-// Variante de fond plus claire (si besoin)
-$color-bg-dark: #111827;
+// Couleurs de fond globales
+$color-bg: #ffffff;           // fond global (bleu nuit)
+$color-bg-sidebar: #020617;   // sidebar très sombre
+$color-bg-main: #f3f4f6;      // fond de page clair derrière les cartes
 
-// Couleur de texte principale
-$color-text-main: #120b0b;     // blanc cassé
-// Texte secondaire
-$color-text-muted: #090a0e;    // gris doux
+// Cartes & surfaces
+$color-card-bg: #ffffff;      // cartes blanches
+$color-card-border: #e5e7eb;
 
-// Couleur principale (boutons, liens)
-$color-primary: #130b11;       // bleu
-$color-primary-soft: #4b6cac;  // bleu très foncé / gris bleuté
+// Texte
+$color-text-main: #0f172a;    // texte principal (bleu foncé)
+$color-text-muted: #6b7280;   // texte secondaire
+$color-text-invert: #f9fafb;  // texte sur fond sombre
 
-// Bordures / traits
-$color-border: #111827;
+// Couleurs principales
+$color-primary: #4f46e5;      // violet/indigo pour les boutons principaux
+$color-primary-soft: #eef2ff; // fond léger violet pour badges / hover
+$color-accent: #6366f1;       // autre accent violet/bleu
 
-// Erreurs
-$color-error: #f97373;
+// Statuts / indicateurs
+$color-success: #22c55e;      // vert (progress OK)
+$color-danger: #ef4444;       // rouge (baisse)
+$color-warning: #f97316;      // orange (attention)
+$color-info: #0ea5e9;         // bleu info
 
-// Rayons & ombres
+// Bordures
+$color-border: #e5e7eb;
+
+// Ombres & rayons
 $radius-lg: 24px;
-$radius-md: 12px;
-$radius-sm: 8px;
+$radius-md: 16px;
+$radius-sm: 10px;
 
-$shadow-soft: 0 24px 60px rgba(15, 23, 42, 0.5);
+$shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.22);
 
 // Breakpoints
 $breakpoint-md: 900px;

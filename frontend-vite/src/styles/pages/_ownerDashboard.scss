@@ -1,39 +1,32 @@
-// src/styles/pages/_ownerDashboard.scss
-
 @use '../variables' as *;
 
 .owner-layout {
   display: flex;
   min-height: 100vh;
-  background: radial-gradient(circle at top, $color-bg 0, $color-bg 40%, #000000 100%);
-  color: $color-text-main;
+  background: $color-bg-main; // ✅ fond clair derrière les cartes
 }
 
 .owner-layout__main {
   flex: 1;
   padding: 1.5rem 2rem;
-  overflow-x: hidden;
+  background: $color-bg-main;
 }
 
-.owner-layout__header {
-  margin-bottom: 1.5rem;
+.owner-layout__header h1 {
+  font-size: 1.5rem;
+  color: $color-text-main;
+}
 
-  h1 {
-    font-size: 1.6rem;
-    margin-bottom: 0.3rem;
-    color: $color-text-main;
-  }
-
-  p {
-    font-size: 0.9rem;
-    color: $color-text-muted;
-  }
+.owner-layout__header p {
+  font-size: 0.9rem;
+  color: $color-text-muted;
 }
 
 .owner-layout__content {
-  border-radius: 1.2rem;
-  background: radial-gradient(circle at top left, #111827 0, $color-bg 60%, $color-bg 100%);
-  border: 1px solid rgba(31, 41, 55, 0.9);
-  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.9);
+  margin-top: 1rem;
   padding: 1.5rem;
+  border-radius: $radius-md;
+  background: $color-card-bg;            // ✅ carte blanche
+  border: 1px solid $color-card-border;
+  box-shadow: $shadow-soft;
 }

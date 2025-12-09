@@ -12,6 +12,9 @@
 
 // Pages
 @use './pages/ownerDashboard';
+@use './pages/ownerAppointments';
+@use './pages/ownerServices';
+ @use './pages/landing';
 
 // Plus tard, tu ajouteras ici :
  //@use './components/navbar';

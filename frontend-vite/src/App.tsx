@@ -13,6 +13,9 @@ import ClientDashboardPage from './pages/Client/ClientDashboardPage';
 import RequireAuth from './components/routing/RequireAuth';
 import RegisterPage from './pages/Auth/RegisterPage';
 import OwnerDashboardPage from "./pages/Owner/OwnerDashboardPage.tsx";
+import OwnerAppointmentsPage from "./pages/Owner/OwnerAppointmentsPage.tsx";
+import OwnerServicesPage from "./pages/Owner/OwnerServicesPage.tsx";
+import OwnerStatsPage from "./pages/Owner/OwnerStatsPage.tsx";
 
 const App: React.FC = () => {
     return (
@@ -45,8 +48,30 @@ const App: React.FC = () => {
             />
 
             <Route path="/register" element={<RegisterPage />} />
-
-
+            <Route
+                path="/owner/appointments"
+                element={
+                    <RequireAuth allowedRoles={['owner']}>
+                        <OwnerAppointmentsPage />
+                    </RequireAuth>
+                }
+            />
+            <Route
+                path="/owner/prestations"
+                element={
+                    <RequireAuth allowedRoles={['owner']}>
+                        <OwnerServicesPage />
+                    </RequireAuth>
+                }
+            />
+            <Route
+                path="/owner/stats"
+                element={
+                    //<RequireAuth allowedRoles={['owner']}>
+                    <OwnerStatsPage />
+                    //</RequireAuth>
+                }
+            />
         </Routes>
     );
 };
