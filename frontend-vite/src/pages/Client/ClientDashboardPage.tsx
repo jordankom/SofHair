@@ -1,65 +1,40 @@
-// FRONTEND
-// ─────────────────────────────────────────────────────────
-// Page client /client
-// Affiche :
-// - "Votre prochain rendez-vous est le ..." si un RDV existe
-// - "Aucun rendez-vous planifié" sinon
-// Actuellement : données simulées (mock)
-// Plus tard : sera remplacé par un appel API BACKEND
-// ─────────────────────────────────────────────────────────
+import React from "react";
+import { CalendarDays, ClipboardList, Scissors, Image, Settings } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-import React from 'react';
-import Card from '../../components/ui/Card';
-import AuthLayout from '../../components/layout/AuthLayout';
-import { useAuth } from '../../context/AuthContext.tsx';
+import "../../styles/pages/_clientDashboard.scss";
 
-interface Appointment {
-    date: string;
-    service: string;
-    salon: string;
-}
+const actions = [
+    { label: "Prendre un rendez-vous", icon: <CalendarDays />, route: "/client/rdv/new", variant: "primary" },
+    { label: "Mes rendez-vous", icon: <ClipboardList />, route: "/client/rdv", variant: "secondary" },
+    { label: "Services disponibles", icon: <Scissors />, route: "/client/services", variant: "pink" },
+    { label: "Galerie", icon: <Image />, route: "/client/gallery", variant: "gold" },
+    { label: "Paramètres", icon: <Settings />, route: "/client/settings", variant: "neutral" }
+];
 
-// Fonction mock (pour l'instant)
-// Plus tard : sera remplacée par un appel API → BACKEND
-function useNextAppointment(): Appointment | null {
-    const simulateAppointment = true; // ← METS false pour tester
-
-    if (!simulateAppointment) return null;
-
-    return {
-        date: "14 janvier 2026 à 10h30",
-        service: "Shampoing + Coupe + Soin",
-        salon: "SoftHair Studio – Centre-ville",
-    };
-}
 
 const ClientDashboardPage: React.FC = () => {
-    const { user } = useAuth();
-    const appointment = useNextAppointment();
-
+    const navigate = useNavigate();
     return (
-        <AuthLayout>
-            <div className="client-dashboard">
+        <div className="client-dashboard">
+            <h1>Bonjour 👋</h1>
+            <p className="subtitle">Que souhaitez-vous faire aujourd’hui ?</p>
 
-            <h1>Bienvenue {user?.email || ""} 👋</h1>
+            <div className="client-dashboard__grid">
+                {actions.map(action => (
+                    <button
+                        key={action.label}
+                        className={`dashboard-card dashboard-card--${action.variant}`}
+                        onClick={() => navigate(action.route)}
 
-    <Card>
-    <h2>Votre prochain rendez-vous</h2>
-
-    {appointment ? (
-        <>
-            <p><strong>Date :</strong> {appointment.date}</p>
-    <p><strong>Prestation :</strong> {appointment.service}</p>
-    <p><strong>Salon :</strong> {appointment.salon}</p>
-    </>
-    ) : (
-        <p>Aucun rendez-vous planifié pour le moment.</p>
-    )}
-    </Card>
-
-    </div>
-    </AuthLayout>
-);
+                    >
+                        <div className="icon">{action.icon}</div>
+                        <span>{action.label}</span>
+                    </button>
+                ))}
+            </div>
+        </div>
+    );
 };
 
 export default ClientDashboardPage;
