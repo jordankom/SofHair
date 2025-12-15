@@ -7,6 +7,7 @@ export interface IService extends Document {
     category: string;      // Catégorie (Coiffure, Coloration, Soin, Homme, etc.)
     price: number;         // Prix en euros
     durationMinutes: number; // Durée en minutes
+    description?: string;  // Description optionnelle
     imageUrl: string;      // URL de l'image
     isActive: boolean;     // Prestation disponible ou non
 }
@@ -18,6 +19,7 @@ const serviceSchema = new Schema<IService>(
         price: { type: Number, required: true },
         durationMinutes: { type: Number, required: true },
         imageUrl: { type: String, required: true },
+        description: { type: String },
         isActive: { type: Boolean, default: true },
     },
     {
