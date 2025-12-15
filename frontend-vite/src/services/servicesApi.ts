@@ -14,6 +14,16 @@ export interface Service {
     isActive: boolean;
 }
 
+export type CreateServicePayload = {
+    name: string;
+    category: string;
+    price: number;
+    durationMinutes: number;
+    description?: string;
+    imageUrl?: string;
+    isActive?: boolean;
+};
+
 // Récupère toutes les prestations, avec un filtre catégorie facultatif
 export async function fetchServices(category?: string): Promise<Service[]> {
     const params: any = {};

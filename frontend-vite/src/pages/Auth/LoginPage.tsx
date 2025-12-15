@@ -23,7 +23,7 @@ const LoginPage: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const { login, user } = useAuth();
+    const { login } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
 
