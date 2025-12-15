@@ -18,7 +18,7 @@ const ClientDashboardPage: React.FC = () => {
 
     const handleLogout = async () => {
         // try {
-        //     // Appel backend facultatif pour invalider la session/cookie
+        //     // Appel backend  pour invalider la session/cookie
         //     await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
         // } catch {
         //     // ignorer les erreurs réseau, continuer la déconnexion côté client
