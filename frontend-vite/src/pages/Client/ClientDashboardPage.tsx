@@ -17,18 +17,18 @@ const ClientDashboardPage: React.FC = () => {
 
 
     const handleLogout = async () => {
-        try {
-            // Appel backend facultatif pour invalider la session/cookie
-            await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
-        } catch {
-            // ignorer les erreurs réseau, continuer la déconnexion côté client
-        }
+        // try {
+        //     // Appel backend facultatif pour invalider la session/cookie
+        //     await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+        // } catch {
+        //     // ignorer les erreurs réseau, continuer la déconnexion côté client
+        // }
 
-        // Supprimer les infos locales (adapter les clés selon votre app)
+        // Supprimer les infos locales d'authentification
         localStorage.removeItem("token");
-        localStorage.removeItem("ownerId");
-        // redirection vers la page de connexion
-        navigate("/login");
+        //localStorage.removeItem("ownerId");
+        // redirection vers la landing page
+        navigate("/");
     };
     const navigate = useNavigate();
     return (
@@ -51,7 +51,7 @@ const ClientDashboardPage: React.FC = () => {
 
 
                 ))}
-                {/*//TODO: Ajouter un BOUTON de déconnexion*/}
+
 
                 {/*<button>deconnexion</button>*/}
                 <button

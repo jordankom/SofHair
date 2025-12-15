@@ -50,7 +50,7 @@ const ClientUserMenu: React.FC = () => {
 
     // Déconnexion : on vide le contexte + on retourne à la landing
     const handleLogout = () => {
-        logout();           // 🔒 supprime token + user (sessionStorage)
+        logout();           //  supprime token + user (sessionStorage)
         setOpen(false);     // ferme le menu
         navigate("/");      //  retour landing
     };
