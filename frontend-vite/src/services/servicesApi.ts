@@ -24,3 +24,8 @@ export async function fetchServices(category?: string): Promise<Service[]> {
     const res = await apiClient.get<Service[]>('/services', { params });
     return res.data;
 }
+
+export async function createService(payload: CreateServicePayload): Promise<Service> {
+    const res = await apiClient.post<Service>("/services", payload);
+    return res.data;
+}

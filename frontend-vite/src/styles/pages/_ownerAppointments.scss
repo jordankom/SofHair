@@ -28,32 +28,61 @@
 
 .owner-appointments__header-actions {
   display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   align-items: center;
-  gap: 0.75rem;
 }
 
 /* Champ date */
-.owner-appointments__date-input {
-  padding: 0.35rem 0.6rem;
-  border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.6);
-  background: rgba(15, 23, 42, 0.9);
-  color: #e5e7eb;
-  font-size: 0.85rem;
+//.owner-appointments__search,
+//.owner-appointments__select,
+//.owner-appointments__date-input {
+//  height: 40px;
+//  padding: 0 12px;
+//  border-radius: 12px;
+//  border: 1px solid rgb(66, 87, 128);
+//  background-color: #406280;
+//  color: #e5e7eb;
+//  outline: none;
+//
+//  &:focus {
+//    border-color: rgba(59, 130, 246, 0.75);
+//    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.18);
+//  }
+//}
+
+.owner-appointments__search,
+.owner-appointments__select,
+.owner-appointments__date-input,
+.owner-appointments__add-btn,
+.owner-appointments__sort-btn {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(59, 130, 246, 0.55);
+  background: rgba(29, 78, 216, 0.9);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(0.95);
+  }
 }
 
 /* Bouton nouveau RDV */
-.owner-appointments__add-btn {
-  border: none;
-  border-radius: 999px;
-  padding: 0.45rem 1rem;
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #ffffff;
-  background: linear-gradient(135deg, #4f46e5, #6366f1);
-  cursor: pointer;
-  box-shadow: 0 14px 32px rgba(79, 70, 229, 0.6);
-}
+//.owner-appointments__add-btn {
+//  border: none;
+//  border-radius: 999px;
+//  padding: 0.45rem 1rem;
+//  font-size: 0.85rem;
+//  font-weight: 500;
+//  color: #ffffff;
+//  background: linear-gradient(135deg, #4f46e5, #6366f1);
+//  cursor: pointer;
+//  box-shadow: 0 14px 32px rgba(79, 70, 229, 0.6);
+//}
 
 /* CONTENU PRINCIPAL : timeline + cartes */
 .owner-appointments__content {
@@ -62,7 +91,7 @@
   gap: 1rem;
   padding: 1rem;
   border-radius: 18px;
-  background: #f9fafb; /* ✅ fond clair */
+  background: #f9fafb; /*  fond clair */
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.35);
 }
 

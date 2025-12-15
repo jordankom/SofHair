@@ -1,0 +1,129 @@
+/* FRONTEND
+   Modal création prestation (owner)
+*/
+
+.owner-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.45);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  z-index: 999;
+}
+
+.owner-modal {
+  width: min(560px, 100%);
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.25);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+.owner-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+
+  h2 {
+    margin: 0;
+    font-size: 16px;
+    color: #0f172a;
+  }
+}
+
+.owner-modal__close {
+  border: 0;
+  background: transparent;
+  font-size: 18px;
+  cursor: pointer;
+  color: #64748b;
+}
+
+.owner-modal__form {
+  padding: 16px 18px;
+  display: grid;
+  gap: 12px;
+}
+
+.owner-modal__label {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  color: #334155;
+}
+
+.owner-modal__input,
+.owner-modal__textarea {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 14px;
+  outline: none;
+
+  &:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+  }
+}
+
+.owner-modal__textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.owner-modal__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.owner-modal__error {
+  margin: 0;
+  color: #b91c1c;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+.owner-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.owner-modal__btn {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.owner-modal__btn--ghost {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #e2e8f0;
+}
+
+.owner-modal__btn--primary {
+  background: #4f46e5;
+  color: #fff;
+
+  &:hover {
+    filter: brightness(0.96);
+  }
+}
+
+@media (max-width: 520px) {
+  .owner-modal__row {
+    grid-template-columns: 1fr;
+  }
+}

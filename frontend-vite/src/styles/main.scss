@@ -15,6 +15,8 @@
 @use './pages/ownerAppointments';
 @use './pages/ownerServices';
  @use './pages/landing';
+@use "./components/ownerServiceModal";
+@use "./components/clientModals";
 
 // Plus tard, tu ajouteras ici :
  //@use './components/navbar';

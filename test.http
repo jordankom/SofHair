@@ -1,0 +1,10 @@
+### GET request to example server
+GET https://examples.http-client.intellij.net/get
+    ?generated-in=WebStorm
+
+###
+GET http://localhost:5000/api/services/categories
+
+###
+GET http://localhost:5000/api/appointments?date=2025-12-15
+Authorization: Bearer <TON_TOKEN_OWNER>

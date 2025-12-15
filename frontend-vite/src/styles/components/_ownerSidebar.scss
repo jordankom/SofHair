@@ -4,7 +4,7 @@
 
 .owner-sidebar {
   position: sticky;
-  top: 0;
+  top: 25px;
   height: 100vh;
   width: 260px;
   display: flex;
@@ -13,13 +13,13 @@
   background: $color-bg-sidebar;
   color: $color-text-invert;
   border-right: 1px solid rgba(15, 23, 42, 0.9);
-  box-shadow: 16px 0 40px rgba(15, 23, 42, 0.8);
+  //box-shadow: 16px 0 40px rgba(15, 23, 42, 0.8);
 }
 //.owner-sidebar__brand {
-//  display: flex;              // ✅ active le flex
-//  flex-direction: column;     // ✅ empile verticalement
-//  justify-content: center;    // ✅ centre verticalement
-//  line-height: 1.1;           // ✅ évite l’effet "écrasé"
+//  display: flex;              // ✅active le flex
+//  flex-direction: column;     //  empile verticalement
+//  justify-content: center;    //  centre verticalement
+//  line-height: 1.1;           //  évite l’effet "écrasé"
 //}
 .owner-sidebar__brand-title {
   font-size: 1.1rem;
@@ -58,13 +58,13 @@
   box-shadow: 0 0 30px rgba(79, 70, 229, 0.7);
 }
 .owner-sidebar__nav--bottom {
-  margin-top: auto; // ✅ FORCE le bloc tout en bas
+  margin-top: auto; //  FORCE le bloc tout en bas
   padding-top: 1.25rem;
     padding-bottom: 3.5rem;
   border-top: 1px solid rgb(255, 255, 255);
 }
 
-/* ✅ Style spécial pour le bouton Déconnexion */
+/*  Style spécial pour le bouton Déconnexion */
 
 .owner-sidebar__nav--bottom .owner-sidebar__item:last-child {
   background: rgba(20, 45, 90, 0.29); //
@@ -74,5 +74,5 @@
 .owner-sidebar__nav--bottom .owner-sidebar__item:last-child:hover {
   background: rgba(239, 68, 68, 0.35);
   color: white;
-  box-shadow: 0 0 14px rgba(239, 68, 68, 0.5);
+  //box-shadow: 0 0 14px rgba(239, 68, 68, 0.5);
 }

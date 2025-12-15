@@ -14,6 +14,22 @@ const actions = [
 
 
 const ClientDashboardPage: React.FC = () => {
+
+
+    const handleLogout = async () => {
+        try {
+            // Appel backend facultatif pour invalider la session/cookie
+            await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+        } catch {
+            // ignorer les erreurs réseau, continuer la déconnexion côté client
+        }
+
+        // Supprimer les infos locales (adapter les clés selon votre app)
+        localStorage.removeItem("token");
+        localStorage.removeItem("ownerId");
+        // redirection vers la page de connexion
+        navigate("/login");
+    };
     const navigate = useNavigate();
     return (
         <div className="client-dashboard">
@@ -31,7 +47,22 @@ const ClientDashboardPage: React.FC = () => {
                         <div className="icon">{action.icon}</div>
                         <span>{action.label}</span>
                     </button>
+
+
+
                 ))}
+                {/*//TODO: Ajouter un BOUTON de déconnexion*/}
+
+                {/*<button>deconnexion</button>*/}
+                <button
+                    className="dashboard-card dashboard-card--neutral"
+                    onClick={handleLogout}
+                    aria-label="Se déconnecter"
+                >
+                    <span>Déconnexion</span>
+                </button>
+
+
             </div>
         </div>
     );

@@ -21,7 +21,7 @@ const LandingPage: React.FC = () => {
                     <div className="landing-hero__content">
                         {/* Texte de localisation/sous-titre au-dessus du titre */}
                         <p className="landing-hero__eyebrow">
-                            Centre-ville de Vancouver
+                            Centre-ville Bruay-sur-Escaut FRANCE
                         </p>
 
                         {/* Titre principal affiché en grand, centré */}
