@@ -8,3 +8,9 @@ GET http://localhost:5000/api/services/categories
 ###
 GET http://localhost:5000/api/appointments?date=2025-12-15
 Authorization: Bearer <TON_TOKEN_OWNER>
+
+###
+https://softhair-backend-81570050060.europe-west1.run.app/api/services
+
+###
+https://softhair-backend-81570050060.europe-west1.run.app/api/services/categories

@@ -1,0 +1,119 @@
+.client-settings {
+  min-height: 100vh;
+  padding: 26px 22px;
+  background: linear-gradient(180deg, #f7f9ff 0%, #ffffff 55%, #f7f7fb 100%);
+  color: #0f172a;
+}
+
+.client-settings__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+
+  h1 {
+    margin: 0;
+    font-size: 30px;
+    letter-spacing: -0.02em;
+  }
+
+  p {
+    margin: 8px 0 0;
+    color: #475569;
+  }
+}
+
+/* Grid de cartes */
+.client-settings__grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 900px) {
+  .client-settings {
+    padding: 18px 14px;
+  }
+
+  .client-settings__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.client-settings__card {
+  border: 1px solid rgba(226, 232, 240, 0.95);
+}
+
+/* Header interne de carte */
+.client-settings__cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* Lignes de données */
+.client-settings__rows {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.client-settings__row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.client-settings__label {
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.client-settings__value {
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Texte d’aide */
+.client-settings__hint {
+  margin: 0 0 14px;
+  color: #475569;
+  line-height: 1.5;
+}
+
+/* Actions */
+.client-settings__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+/**
+ * Boutons :
+ * Ici on ajoute juste une variante "danger" cohérente.
+ */
+.client-btn--danger {
+  background: #ef4444;
+  color: #fff;
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}

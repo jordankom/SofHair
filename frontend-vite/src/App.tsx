@@ -1,89 +1,131 @@
-// FRONTEND
-// Définition des routes :
-// - "/"        → Landing page publique
-// - "/login"   → page de connexion
-// - "/client"  → réservé au rôle "client"
-// - "/owner"   → réservé au rôle "owner"
+import React from "react";
+import { Routes, Route } from "react-router-dom";
 
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import LandingPage from './pages/Auth/LandingPage';
-import LoginPage from './pages/Auth/LoginPage';
-import ClientDashboardPage from './pages/Client/ClientDashboardPage';
-import RequireAuth from './components/routing/RequireAuth';
-import RegisterPage from './pages/Auth/RegisterPage';
-import OwnerDashboardPage from "./pages/Owner/OwnerDashboardPage.tsx";
-import OwnerAppointmentsPage from "./pages/Owner/OwnerAppointmentsPage.tsx";
-import OwnerServicesPage from "./pages/Owner/OwnerServicesPage.tsx";
-import OwnerStatsPage from "./pages/Owner/OwnerStatsPage.tsx";
-import RdvNew from "./pages/Client/Rdvs.tsx";
-import Rdvs from "./pages/Client/Rdvs.tsx";
-import Services from "./pages/Client/Services.tsx";
-import Gallery from "./pages/Client/Gallery.tsx";
-import {Settings} from "lucide-react";
+import LandingPage from "./pages/Auth/LandingPage";
+import LoginPage from "./pages/Auth/LoginPage";
+import RegisterPage from "./pages/Auth/RegisterPage";
+
+import RequireAuth from "./components/routing/RequireAuth";
+
+import ClientDashboardPage from "./pages/Client/ClientDashboardPage";
+import Services from "./pages/Client/Services";
+import Gallery from "./pages/Client/Gallery";
+
+import RdvNew from "./pages/Client/RdvNew";
+import Rdvs from "./pages/Client/Rdvs";
+import ClientSettingsPage from "./pages/Client/Settings";
+
+import OwnerDashboardPage from "./pages/Owner/OwnerDashboardPage";
+import OwnerAppointmentsPage from "./pages/Owner/OwnerAppointmentsPage";
+import OwnerServicesPage from "./pages/Owner/OwnerServicesPage";
+import OwnerStatsPage from "./pages/Owner/OwnerStatsPage";
 
 const App: React.FC = () => {
     return (
         <Routes>
-            {/* Page publique */}
+            {/* ===================== */}
+            {/* Routes publiques */}
+            {/* ===================== */}
             <Route path="/" element={<LandingPage />} />
-
-            {/* Connexion */}
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
 
+            {/* ===================== */}
             {/* Espace client (protégé) */}
+            {/* ===================== */}
             <Route
                 path="/client"
                 element={
-                    <RequireAuth allowedRoles={['client']}>
+                    <RequireAuth allowedRoles={["client"]}>
                         <ClientDashboardPage />
                     </RequireAuth>
                 }
             />
 
-            {/* Espace propriétaire (admin salon) */}
+            {/* ✅ On protège aussi toutes les routes enfant du client */}
+            <Route
+                path="/client/rdv/new"
+                element={
+                    <RequireAuth allowedRoles={["client"]}>
+                        <RdvNew />
+                    </RequireAuth>
+                }
+            />
 
+            <Route
+                path="/client/rdv"
+                element={
+                    <RequireAuth allowedRoles={["client"]}>
+                        <Rdvs />
+                    </RequireAuth>
+                }
+            />
+
+            <Route
+                path="/client/services"
+                element={
+                    <RequireAuth allowedRoles={["client"]}>
+                        <Services />
+                    </RequireAuth>
+                }
+            />
+
+            <Route
+                path="/client/gallery"
+                element={
+                    <RequireAuth allowedRoles={["client"]}>
+                        <Gallery />
+                    </RequireAuth>
+                }
+            />
+
+            <Route
+                path="/client/settings"
+                element={
+                    <RequireAuth allowedRoles={["client"]}>
+                        <ClientSettingsPage />
+                    </RequireAuth>
+                }
+            />
+
+            {/* ===================== */}
+            {/* Espace owner (protégé) */}
+            {/* ===================== */}
             <Route
                 path="/owner"
                 element={
-                    <RequireAuth allowedRoles={['owner']}>
+                    <RequireAuth allowedRoles={["owner"]}>
                         <OwnerDashboardPage />
                     </RequireAuth>
                 }
             />
 
-            <Route path="/register" element={<RegisterPage />} />
             <Route
                 path="/owner/appointments"
                 element={
-                    <RequireAuth allowedRoles={['owner']}>
+                    <RequireAuth allowedRoles={["owner"]}>
                         <OwnerAppointmentsPage />
                     </RequireAuth>
                 }
             />
+
             <Route
                 path="/owner/prestations"
                 element={
-                    <RequireAuth allowedRoles={['owner']}>
+                    <RequireAuth allowedRoles={["owner"]}>
                         <OwnerServicesPage />
                     </RequireAuth>
                 }
             />
+
             <Route
                 path="/owner/stats"
                 element={
-                    <RequireAuth allowedRoles={['owner']}>
-                    <OwnerStatsPage />
+                    <RequireAuth allowedRoles={["owner"]}>
+                        <OwnerStatsPage />
                     </RequireAuth>
                 }
             />
-
-            <Route path="/client" element={<ClientDashboardPage />} />
-            <Route path="/client/rdv/new" element={<RdvNew />} />
-            <Route path="/client/rdv" element={<Rdvs />} />
-            <Route path="/client/services" element={<Services />} />
-            <Route path="/client/gallery" element={<Gallery />} />
-            <Route path="/client/settings" element={<Settings />} />
         </Routes>
     );
 };

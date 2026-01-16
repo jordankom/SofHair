@@ -3,13 +3,24 @@
 
 import { Router } from "express";
 import { requireAuth,requireOwner  } from "../middlewares/auth.middleware";
-import { createAppointment, getAvailability, listAppointmentsForDay } from "../controllers/appointment.controller";
+import { createAppointment,
+    getAvailability,
+    listAppointmentsForDay,
+    listMyAppointments,
+    cancelAppointment,
+    rescheduleAppointment,
+} from "../controllers/appointment.controller";
 
 const router = Router();
 
 //  toutes les routes RDV nécessitent un token
 router.use(requireAuth);
-
+//  Client : mes RDV
+router.get("/my", listMyAppointments);
+// Client : annuler un RDV
+router.patch("/:id/cancel", cancelAppointment);
+// Client : reporter un RDV
+router.patch("/:id/reschedule", rescheduleAppointment);
 // Disponibilités
 router.get("/availability", getAvailability);
 // owner voit les rdv du jour
