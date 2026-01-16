@@ -14,7 +14,14 @@ const app: Application = express();
 app.use(helmet());
 
 // Autoriser les requêtes depuis le frontend
-app.use(cors());
+app.use(cors({
+    origin: [
+        "https://softhair-41140.web.app",
+        "https://softhair-41140.firebaseapp.com",
+        "https://softhair.site"
+    ],
+    credentials: false, // true uniquement si cookies
+}));
 
 // Parsing du JSON
 app.use(express.json());
