@@ -1,0 +1,220 @@
+// FRONTEND - src/styles/pages/_clientRdvs.scss
+// Page "Mes rendez-vous" (client)
+// - Carte carrée centrale pour le prochain RDV
+// - Image du service intégrée
+// - Filtres en haut à droite
+
+@use "../variables" as *;
+@use "../mixins" as *;
+
+.client-rdvs {
+  min-height: 100vh;
+  padding: 26px 22px;
+  background: linear-gradient(180deg, #f7f9ff 0%, #ffffff 55%, #f7f7fb 100%);
+  color: $color-text-main;
+
+  @include respond-md {
+    padding: 18px 14px;
+  }
+}
+
+/* ========================= */
+/* Header + filtre           */
+/* ========================= */
+.client-rdvs__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+
+  h1 {
+    margin: 0;
+    font-size: 30px;
+    letter-spacing: -0.02em;
+  }
+
+  p {
+    margin-top: 6px;
+    font-size: 14px;
+    color: $color-text-muted;
+  }
+
+  @include respond-md {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.client-rdvs__filter {
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  background: rgba(255, 255, 255, 0.95);
+  color: $color-text-main;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+  }
+
+  @include respond-md {
+    width: 100%;
+  }
+}
+
+/* ============================= */
+/* Centrage de la carte principale */
+/* ============================= */
+.client-rdvs__center {
+  min-height: calc(100vh - 160px);
+  display: grid;
+  place-items: center;
+}
+
+/* ============================= */
+/* Carte carrée "Prochain RDV"   */
+/* ============================= */
+.rdv-heroSquare {
+  width: min(520px, 92vw);
+  aspect-ratio: 1 / 1;
+  border-radius: 26px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+
+  box-shadow:
+          0 26px 65px rgba(15, 23, 42, 0.12),
+          inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  display: grid;
+  grid-template-rows: 46% auto auto;
+}
+
+/* ============================= */
+/* Image du service              */
+/* ============================= */
+.rdv-heroSquare__image {
+  position: relative;
+  background: #eef2ff;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Overlay léger pour lisibilité */
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+                    to bottom,
+                    rgba(15, 23, 42, 0.25),
+                    rgba(15, 23, 42, 0.05) 60%,
+                    rgba(255, 255, 255, 0.85)
+    );
+  }
+}
+
+/* Fallback si pas d’image */
+.rdv-heroSquare__image--placeholder {
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: $color-text-muted;
+  background: radial-gradient(circle at top left, #eef2ff, #ffffff 70%);
+}
+
+/* ============================= */
+/* Contenu                       */
+/* ============================= */
+.rdv-heroSquare__content {
+  padding: 18px 20px 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.rdv-heroSquare__kicker {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $color-primary;
+}
+
+.rdv-heroSquare__title {
+  margin: 0;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  color: $color-text-main;
+}
+
+.rdv-heroSquare__subtitle {
+  font-size: 14px;
+  color: $color-text-muted;
+}
+
+/* Badges */
+.rdv-heroSquare__meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ============================= */
+/* Actions (bas de carte)        */
+/* ============================= */
+.rdv-heroSquare__actions {
+  padding: 14px 20px 20px;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+
+  @include respond-sm {
+    flex-direction: column;
+  }
+}
+
+/* ============================= */
+/* Boutons supplémentaires       */
+/* ============================= */
+.client-btn--soft {
+  background: $color-primary-soft;
+  color: $color-primary;
+  border: 1px solid rgba(79, 70, 229, 0.22);
+}
+
+.client-btn--danger {
+  background: #fff1f2;
+  color: #9f1239;
+  border: 1px solid #fecdd3;
+}
+
+/* ============================= */
+/* Liste filtrée (hors prochain) */
+/* ============================= */
+.client-rdvs__listWrap {
+  display: grid;
+  gap: 12px;
+}
+
+.rdv-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 18px;
+  padding: 14px;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rdv-card--muted {
+  opacity: 0.7;
+}

@@ -64,7 +64,7 @@ export async function createAppointment(params: {
     }
 
     const created = await AppointmentModel.create({
-        clientId: new Types.ObjectId(params.clientId),
+        userId: new Types.ObjectId(params.clientId),
         serviceId: new Types.ObjectId(params.serviceId),
         startAt,
         endAt,

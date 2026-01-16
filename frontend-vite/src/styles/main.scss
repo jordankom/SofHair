@@ -14,7 +14,10 @@
 @use './pages/ownerDashboard';
 @use './pages/ownerAppointments';
 @use './pages/ownerServices';
- @use './pages/landing';
+@use './pages/landing';
+@use "./pages/clientRdvs";
+@use './pages/clientGallery';
+
 @use "./components/ownerServiceModal";
 @use "./components/clientModals";
 

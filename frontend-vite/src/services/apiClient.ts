@@ -4,10 +4,11 @@
 import axios from 'axios';
 
 export const apiClient = axios.create({
-    baseURL: 'http://localhost:5000/api', // URL backend
+    baseURL: import.meta.env.VITE_API_URL , //|| 'http://localhost:,5000/api',
     headers: {
         'Content-Type': 'application/json'
     }
+
 });
 
 apiClient.interceptors.request.use((config) => {
@@ -16,5 +17,6 @@ apiClient.interceptors.request.use((config) => {
         config.headers = config.headers ?? {};
         config.headers.Authorization = `Bearer ${token}`;
     }
+    console.log("VITE_API_URL =", import.meta.env.VITE_API_URL);
     return config;
 });
