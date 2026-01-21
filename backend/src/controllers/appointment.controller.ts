@@ -87,14 +87,17 @@ function buildSlotsFromStaffSchedule(dateYYYYMMDD: string, staffDay: { start: st
 
 
 
+
+
+
 export async function createAppointment(req: AuthenticatedRequest, res: Response) {
     try {
         if (!req.user) return res.status(401).json({ message: "Non authentifié." });
 
         const { serviceId, dateTimeISO, staffId } = req.body as {
-            serviceId: string;
-            dateTimeISO: string;
-            staffId: string;
+            serviceId?: string;
+            dateTimeISO?: string;
+            staffId?: string;
         };
 
         if (!serviceId || !dateTimeISO || !staffId) {
@@ -107,18 +110,30 @@ export async function createAppointment(req: AuthenticatedRequest, res: Response
             return res.status(404).json({ message: "Prestation introuvable ou inactive." });
         }
 
+        // 1bis) Vérifie le coiffeur
+        const staff = await StaffModel.findById(staffId);
+        if (!staff) {
+            return res.status(404).json({ message: "Coiffeur introuvable." });
+        }
+        if (!staff.isActive) {
+            return res.status(400).json({ message: "Ce coiffeur est indisponible (inactif)." });
+        }
+
         // 2) Dates
         const startAt = new Date(dateTimeISO);
         if (Number.isNaN(startAt.getTime())) {
             return res.status(400).json({ message: "dateTimeISO invalide." });
         }
 
-        //  règle : pas de RDV dans le passé
-        if (dayjs(startAt).isBefore(dayjs())) {
+        const now = dayjs();
+        const start = dayjs(startAt);
+
+        // règle : pas de RDV dans le passé (ou égal à maintenant)
+        if (!start.isAfter(now)) {
             return res.status(409).json({ message: "Impossible de réserver un créneau déjà passé." });
         }
 
-        const endAt = dayjs(startAt).add(service.durationMinutes, "minute").toDate();
+        const endAt = start.add(service.durationMinutes, "minute").toDate();
 
         // 3) Conflit (même coiffeur / même startAt / booked)
         const exists = await AppointmentModel.findOne({
@@ -131,7 +146,8 @@ export async function createAppointment(req: AuthenticatedRequest, res: Response
             return res.status(409).json({ message: "Créneau déjà réservé pour ce coiffeur." });
         }
 
-        // 4)  Promo ( promo active)
+        // 4) Promo
+
         const { promo, priceFinal } = await findBestActivePromoForService(service);
 
         // 5) Création RDV + stockage pricePaid + promoApplied
@@ -143,6 +159,7 @@ export async function createAppointment(req: AuthenticatedRequest, res: Response
             endAt,
             status: "booked",
 
+            //
             pricePaid: priceFinal,
 
             promoApplied: promo
