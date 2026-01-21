@@ -21,6 +21,7 @@ import OwnerServicesPage from "./pages/Owner/OwnerServicesPage";
 import OwnerStatsPage from "./pages/Owner/OwnerStatsPage";
 import OwnerClientsPage from "./pages/Owner/OwnerClientsPage";
 import OwnerTeamPage from "./pages/Owner/OwnerTeamPage.tsx";
+import OwnerPromotionsPage from "./pages/Owner/OwnerPromotionsPage";
 
 const App: React.FC = () => {
     return (
@@ -44,7 +45,7 @@ const App: React.FC = () => {
                 }
             />
 
-            {/* ✅ On protège aussi toutes les routes enfant du client */}
+            {/*  On protège aussi toutes les routes enfant du client */}
             <Route
                 path="/client/rdv/new"
                 element={
@@ -115,6 +116,14 @@ const App: React.FC = () => {
                 element={
                     <RequireAuth allowedRoles={["owner"]}>
                         <OwnerTeamPage />
+                    </RequireAuth>
+                }
+            />
+            <Route
+                path="/owner/promotions"
+                element={
+                    <RequireAuth allowedRoles={["owner"]}>
+                        <OwnerPromotionsPage />
                     </RequireAuth>
                 }
             />

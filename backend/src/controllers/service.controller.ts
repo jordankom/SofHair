@@ -1,26 +1,47 @@
 // Contrôleur des prestations (services).
-// Pour l'instant :
-// - GET /api/services → liste toutes les prestations avec filtres simples (catégorie)
+// GET /api/services → liste toutes les prestations avec filtres simples (catégorie)
+// ✅ Ajout : calcule priceFinal + promoApplied (affichage promo côté front)
 
-import { Request, Response } from 'express';
-import { ServiceModel } from '../models/service.model';
+import { Request, Response } from "express";
+import { ServiceModel } from "../models/service.model";
 import { getAllCategories } from "../services/service.service";
+import { findBestActivePromoForService } from "../utils/promotions";
 
 export async function getServices(req: Request, res: Response) {
     try {
         const { category } = req.query;
 
         const query: any = {};
-        if (category && typeof category === 'string' && category !== 'Toutes') {
+        if (category && typeof category === "string" && category !== "Toutes") {
             query.category = category;
         }
 
         const services = await ServiceModel.find(query).sort({ name: 1 });
 
-        return res.json(services);
+        //  Pour chaque service : calc promo + priceFinal (pour affichage)
+        const enriched = await Promise.all(
+            services.map(async (s) => {
+                const { promo, priceFinal } = await findBestActivePromoForService(s);
+
+                return {
+                    ...s.toObject(),
+                    priceFinal,
+                    promoApplied: promo
+                        ? {
+                            _id: promo._id,
+                            name: promo.name,
+                            type: promo.type,
+                            value: promo.value,
+                        }
+                        : null,
+                };
+            })
+        );
+
+        return res.json(enriched);
     } catch (error) {
-        console.error('[SERVICES] Erreur getServices :', error);
-        return res.status(500).json({ message: 'Erreur lors de la récupération des prestations.' });
+        console.error("[SERVICES] Erreur getServices :", error);
+        return res.status(500).json({ message: "Erreur lors de la récupération des prestations." });
     }
 }
 
@@ -36,12 +57,12 @@ export async function listServiceCategories(req: Request, res: Response) {
 
 export async function createService(req: Request, res: Response) {
     try {
-        // Champs reçus du front
         const { name, category, price, durationMinutes, description, imageUrl } = req.body;
 
-        // évite de créer des prestations vides
         if (!name || !category || !price || !durationMinutes) {
-            return res.status(400).json({ message: "Champs manquants (name, category, price, durationMinutes)." });
+            return res.status(400).json({
+                message: "Champs manquants (name, category, price, durationMinutes).",
+            });
         }
 
         const created = await ServiceModel.create({

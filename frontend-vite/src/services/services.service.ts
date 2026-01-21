@@ -1,15 +1,27 @@
-// Appels API liés aux prestations/services
-
 import { apiClient } from "./apiClient";
 
-export interface ServiceItem {
+export type PromoApplied = {
+    _id: string;
+    name: string;
+    type: "percent" | "amount";
+    value: number;
+};
+
+export type ServiceItem = {
     _id: string;
     name: string;
     category: string;
-    price?: number;
-    imageUrl?: string; // ou "image" selon ton backend
+
+    price: number;
+    durationMinutes: number;
+    imageUrl?: string;
     description?: string;
-}
+    isActive?: boolean;
+
+    //  renvoyé par le backend si promo
+    priceFinal?: number;
+    promoApplied?: PromoApplied | null;
+};
 
 export async function getServices(category?: string): Promise<ServiceItem[]> {
     const res = await apiClient.get<ServiceItem[]>("/services", {
