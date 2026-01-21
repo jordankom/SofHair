@@ -1,0 +1,197 @@
+@use "../variables" as *;
+@use "../mixins" as *;
+
+.owner-team__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 14px;
+  margin-bottom: 14px;
+
+  @include respond-sm {
+    flex-direction: column;
+    align-items: stretch;
+
+    .ui-button {
+      width: 100%;
+    }
+  }
+}
+
+.owner-team__content {
+  margin-top: 1rem;
+  padding: 1.5rem;
+  border-radius: $radius-md;
+  background: $color-card-bg;
+  border: 1px solid $color-card-border;
+  box-shadow: $shadow-soft;
+}
+
+.owner-team__error {
+  margin: 10px 0 14px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #9f1239;
+  font-size: 14px;
+}
+
+.owner-team__empty {
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px dashed rgba(15, 23, 42, 0.2);
+  background: rgba(255, 255, 255, 0.7);
+  color: $color-text-muted;
+}
+
+.owner-team__grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  @include respond-md {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include respond-sm {
+    grid-template-columns: 1fr;
+  }
+}
+
+.owner-teamCard {
+  background: #fff;
+  border: 1px solid $color-card-border;
+  border-radius: 18px;
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.10);
+  }
+}
+
+.owner-teamCard__top {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.owner-teamCard__avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: radial-gradient(circle at top left, $color-primary-soft 0%, #ffffff 70%);
+  display: grid;
+  place-items: center;
+}
+
+.owner-teamCard__avatarPlaceholder {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: $color-primary;
+}
+
+.owner-teamCard__info {
+  display: grid;
+  gap: 4px;
+}
+
+.owner-teamCard__name {
+  font-weight: 800;
+  color: $color-text-main;
+}
+
+.owner-teamCard__meta {
+  font-size: 13px;
+  color: $color-text-muted;
+
+  .muted {
+    color: rgba(107, 114, 128, 0.8);
+  }
+}
+
+.owner-teamCard__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.badge {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.10);
+  background: #f1f5f9;
+  color: $color-text-main;
+}
+
+.badge--ok {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.25);
+  color: #166534;
+}
+
+.badge--off {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.22);
+  color: #991b1b;
+}
+
+.linkBtn {
+  border: 0;
+  background: transparent;
+  color: $color-primary;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+/* Modal form (réutilise ton style modal, mais inputs owner) */
+.owner-teamModal__form {
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.owner-teamModal__label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  color: $color-text-main;
+  font-weight: 600;
+}
+
+.owner-teamModal__input {
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #fff;
+  outline: none;
+
+  &:focus {
+    border-color: $color-primary;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.14);
+  }
+}
+
+.owner-teamModal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 6px;
+}

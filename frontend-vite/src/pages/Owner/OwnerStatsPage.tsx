@@ -1,133 +1,207 @@
-// Page Statistiques du salon (espace propriétaire).
-// - Affiche quelques KPI (CA, rendez-vous, annulations, satisfaction)
-// - Affiche un mini "graphique" en barres (moyenne de rendez-vous / jour)
-// Pour l'instant : données mock, on branchera au backend plus tard.
-
-import React from 'react';
-import OwnerSidebar from '../../components/layout/OwnerSidebar';
-import '../../styles/pages/_ownerStats.scss';
-
-interface KpiCard {
-    label: string;
-    value: string;
-    badge?: string;
-    trend?: 'up' | 'down' | 'neutral';
-}
-
-const kpis: KpiCard[] = [
-    {
-        label: 'Chiffre d’affaires (mois en cours)',
-        value: '8 450 €',
-        badge: '+12% vs. mois dernier',
-        trend: 'up',
-    },
-    {
-        label: 'Rendez-vous réalisés',
-        value: '127',
-        badge: 'sur 142 réservés',
-        trend: 'neutral',
-    },
-    {
-        label: 'Taux d’annulation',
-        value: '10,6%',
-        badge: '-3 pts vs. mois dernier',
-        trend: 'down',
-    },
-    {
-        label: 'Satisfaction moyenne',
-        value: '4,7 / 5',
-        badge: 'basée sur 89 avis',
-        trend: 'up',
-    },
-];
-
-// Données mock pour un mini graphique "Rdv par jour"
-const appointmentsPerDay = [
-    { day: 'Lun', value: 18 },
-    { day: 'Mar', value: 22 },
-    { day: 'Mer', value: 15 },
-    { day: 'Jeu', value: 26 },
-    { day: 'Ven', value: 32 },
-    { day: 'Sam', value: 40 },
-    { day: 'Dim', value: 9 },
-];
+// frontend/src/pages/Owner/OwnerStatsPage.tsx
+import React, { useEffect, useMemo, useState } from "react";
+import dayjs from "dayjs";
+import OwnerSidebar from "../../components/layout/OwnerSidebar";
+import "../../styles/pages/_ownerStats.scss";
+import { getOwnerStats, type OwnerStatsResponse } from "../../services/owner.service";
 
 const OwnerStatsPage: React.FC = () => {
+    // Par défaut : mois en cours
+    const [from, setFrom] = useState(() => dayjs().startOf("month").format("YYYY-MM-DD"));
+    const [to, setTo] = useState(() => dayjs().endOf("month").format("YYYY-MM-DD"));
+
+    const [data, setData] = useState<OwnerStatsResponse | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    const refresh = async (range?: { from: string; to: string }) => {
+        try {
+            setLoading(true);
+            setError(null);
+            const res = await getOwnerStats(range ?? { from, to });
+            setData(res);
+        } catch (e: any) {
+            setError(e?.response?.data?.message || "Impossible de charger les statistiques.");
+            setData(null);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        refresh();
+
+    }, []);
+
+    // Chart: transforme rdvPerDay en format affichable
+    const chartBars = useMemo(() => {
+        const items = data?.rdvPerDay ?? [];
+        // label court (DD/MM)
+        return items.map((x) => ({
+            label: dayjs(x.date).format("DD/MM"),
+            value: x.count,
+        }));
+    }, [data]);
+
+    // Pour calculer la hauteur max (pour un rendu joli)
+    const maxValue = useMemo(() => {
+        const vals = chartBars.map((b) => b.value);
+        return vals.length ? Math.max(...vals) : 1;
+    }, [chartBars]);
+
+    // KPI formatés
+    const revenueLabel = useMemo(() => {
+        const v = data?.kpis.revenue ?? 0;
+        return `${v.toFixed(0)} €`;
+    }, [data]);
+
     return (
         <div className="owner-layout">
-            {/* Barre latérale à gauche */}
             <OwnerSidebar />
 
-            {/* Contenu principal à droite */}
             <main className="owner-layout__main owner-stats">
                 {/* HEADER */}
                 <header className="owner-stats__header">
                     <div>
                         <h1>Statistiques du salon</h1>
-                        <p>Suivez les performances de SoftHair : rendez-vous, revenus, fidélité.</p>
+                        <p>Suivez les performances : rendez-vous, revenus, activité.</p>
+                    </div>
+
+                    {/* Filtres période */}
+                    <div className="owner-stats__filters">
+                        <div className="owner-stats__filter">
+                            <label>Du</label>
+                            <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
+                        </div>
+
+                        <div className="owner-stats__filter">
+                            <label>Au</label>
+                            <input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
+                        </div>
+
+                        <button
+                            className="owner-stats__apply"
+                            onClick={() => refresh({ from, to })}
+                            disabled={loading}
+                            title="Rafraîchir les statistiques"
+                        >
+                            {loading ? "Chargement…" : "Appliquer"}
+                        </button>
                     </div>
                 </header>
 
-                {/* ZONE KPI */}
-                <section className="owner-stats__kpis">
-                    {kpis.map((kpi) => (
-                        <article key={kpi.label} className="owner-stats__kpi-card">
-                            <p className="owner-stats__kpi-label">{kpi.label}</p>
-                            <p className="owner-stats__kpi-value">{kpi.value}</p>
-                            {kpi.badge && (
-                                <span
-                                    className={`
-                    owner-stats__kpi-badge
-                    ${kpi.trend === 'up' ? 'owner-stats__kpi-badge--up' : ''}
-                    ${kpi.trend === 'down' ? 'owner-stats__kpi-badge--down' : ''}
-                  `}
-                                >
-                  {kpi.badge}
+                {error && <p className="owner-stats__error">{error}</p>}
+                {loading && <p>Chargement…</p>}
+
+                {!loading && !error && data && (
+                    <>
+                        {/* KPI */}
+                        <section className="owner-stats__kpis">
+                            <article className="owner-stats__kpi-card">
+                                <p className="owner-stats__kpi-label">Chiffre d’affaires (période)</p>
+                                <p className="owner-stats__kpi-value">{revenueLabel}</p>
+                                <span className="owner-stats__kpi-badge owner-stats__kpi-badge--up">
+                  booked uniquement
                 </span>
-                            )}
-                        </article>
-                    ))}
-                </section>
+                            </article>
 
-                {/* ZONE "GRAPHIQUE" */}
-                <section className="owner-stats__grid">
-                    {/* Mini graphique : rendez-vous par jour */}
-                    <article className="owner-stats__card owner-stats__card--chart">
-                        <div className="owner-stats__card-header">
-                            <h2>Rendez-vous par jour</h2>
-                            <p>Volume de rendez-vous sur une semaine type.</p>
-                        </div>
+                            <article className="owner-stats__kpi-card">
+                                <p className="owner-stats__kpi-label">Rendez-vous (booked)</p>
+                                <p className="owner-stats__kpi-value">{data.kpis.totalAppointments}</p>
+                                <span className="owner-stats__kpi-badge">sur la période</span>
+                            </article>
 
-                        <div className="owner-stats__chart">
-                            {appointmentsPerDay.map((item) => (
-                                <div key={item.day} className="owner-stats__chart-bar">
-                                    <div
-                                        className="owner-stats__chart-bar-fill"
-                                        style={{ height: `${item.value * 2}%` }} // 2% * valeur (juste visuel)
-                                    />
-                                    <span className="owner-stats__chart-bar-label">{item.day}</span>
+                            <article className="owner-stats__kpi-card">
+                                <p className="owner-stats__kpi-label">Reports (total)</p>
+                                <p className="owner-stats__kpi-value">{data.kpis.totalReschedules}</p>
+                                <span className="owner-stats__kpi-badge">somme de rescheduleCount</span>
+                            </article>
+
+                            <article className="owner-stats__kpi-card">
+                                <p className="owner-stats__kpi-label">Top prestation</p>
+                                <p className="owner-stats__kpi-value">
+                                    {data.topServices[0]?.name ?? "—"}
+                                </p>
+                                <span className="owner-stats__kpi-badge">
+                  {data.topServices[0] ? `${data.topServices[0].count} RDV` : "Aucune donnée"}
+                </span>
+                            </article>
+                        </section>
+
+                        {/* GRID */}
+                        <section className="owner-stats__grid">
+                            {/* Chart */}
+                            <article className="owner-stats__card owner-stats__card--chart">
+                                <div className="owner-stats__card-header">
+                                    <h2>Rendez-vous par jour</h2>
+                                    <p>Période : {data.range.from} → {data.range.to}</p>
                                 </div>
-                            ))}
-                        </div>
-                    </article>
 
-                    {/* Bloc complémentaire : prochaine étape */}
-                    <article className="owner-stats__card owner-stats__card--todo">
-                        <div className="owner-stats__card-header">
-                            <h2>À venir</h2>
-                            <p>
-                                Cette section affichera des statistiques avancées : prestations les plus
-                                réservées, heures de pointe, répartition par coiffeur, etc.
-                            </p>
-                        </div>
+                                <div className="owner-stats__chart">
+                                    {chartBars.length === 0 ? (
+                                        <p style={{ color: "#64748b" }}>Aucune donnée sur cette période.</p>
+                                    ) : (
+                                        chartBars.map((b) => {
+                                            const heightPct = Math.round((b.value / maxValue) * 100);
+                                            return (
+                                                <div key={b.label} className="owner-stats__chart-bar">
+                                                    <div
+                                                        className="owner-stats__chart-bar-fill"
+                                                        style={{ height: `${heightPct}%` }}
+                                                        title={`${b.value} RDV`}
+                                                    />
+                                                    <span className="owner-stats__chart-bar-label">{b.label}</span>
+                                                </div>
+                                            );
+                                        })
+                                    )}
+                                </div>
+                            </article>
 
-                        <ul className="owner-stats__todo-list">
-                            <li>➜ Connecter ces graphiques au backend.</li>
-                            <li>➜ Ajouter un filtre par période (jour / semaine / mois).</li>
-                            <li>➜ Afficher les prestations les plus rentables.</li>
-                        </ul>
-                    </article>
-                </section>
+                            {/* Right card: top lists */}
+                            <article className="owner-stats__card owner-stats__card--todo">
+                                <div className="owner-stats__card-header">
+                                    <h2>Top (période)</h2>
+                                    <p>Prestations & coiffeurs les plus sollicités.</p>
+                                </div>
+
+                                <div className="owner-stats__tops">
+                                    <div className="owner-stats__topBlock">
+                                        <h3>Prestations</h3>
+                                        <ul>
+                                            {data.topServices.length === 0 ? (
+                                                <li className="muted">—</li>
+                                            ) : (
+                                                data.topServices.map((s) => (
+                                                    <li key={s.serviceId}>
+                                                        <span>{s.name}</span>
+                                                        <span className="muted">{s.count} rdv • {s.revenue.toFixed(0)}€</span>
+                                                    </li>
+                                                ))
+                                            )}
+                                        </ul>
+                                    </div>
+
+                                    <div className="owner-stats__topBlock">
+                                        <h3>Coiffeurs</h3>
+                                        <ul>
+                                            {data.topStaff.length === 0 ? (
+                                                <li className="muted">—</li>
+                                            ) : (
+                                                data.topStaff.map((s) => (
+                                                    <li key={s.staffId}>
+                                                        <span>{s.firstName} {s.lastName}</span>
+                                                        <span className="muted">{s.count} rdv</span>
+                                                    </li>
+                                                ))
+                                            )}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </article>
+                        </section>
+                    </>
+                )}
             </main>
         </div>
     );

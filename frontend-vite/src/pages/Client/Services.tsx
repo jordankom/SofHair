@@ -80,12 +80,17 @@ const Services: React.FC = () => {
         }, 3  * 1000); // 3 secondes
     };
 
-    const handleConfirmBooking = async (payload: { serviceId: string; dateTimeISO: string }) => {
+    const handleConfirmBooking = async (payload: { serviceId: string; dateTimeISO: string;staffId: string }) => {
         try {
             setBookingSubmitting(true);
             setError(null);
 
-            await createAppointment(payload);
+            await createAppointment({
+                serviceId: payload.serviceId,
+                dateTimeISO: payload.dateTimeISO,
+                staffId: payload.staffId,
+            });
+
 
             // affichage toast
             showToast("Réservation confirmée ✅");
