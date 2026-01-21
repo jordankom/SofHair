@@ -101,7 +101,7 @@ const OwnerStatsPage: React.FC = () => {
                                 <p className="owner-stats__kpi-label">Chiffre d’affaires (période)</p>
                                 <p className="owner-stats__kpi-value">{revenueLabel}</p>
                                 <span className="owner-stats__kpi-badge owner-stats__kpi-badge--up">
-                  booked uniquement
+                  Prestations réservées et payées
                 </span>
                             </article>
 
@@ -114,7 +114,7 @@ const OwnerStatsPage: React.FC = () => {
                             <article className="owner-stats__kpi-card">
                                 <p className="owner-stats__kpi-label">Reports (total)</p>
                                 <p className="owner-stats__kpi-value">{data.kpis.totalReschedules}</p>
-                                <span className="owner-stats__kpi-badge">somme de rescheduleCount</span>
+                                <span className="owner-stats__kpi-badge">Rendez-vous annulés</span>
                             </article>
 
                             <article className="owner-stats__kpi-card">
