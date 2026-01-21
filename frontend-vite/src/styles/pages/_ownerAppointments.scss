@@ -1,180 +1,279 @@
-// FRONTEND
-// Styles pour la page Rendez-vous (vue simple & claire)
-
 @use '../variables' as *;
 
 .owner-appointments {
-  /* on garde le fond général du layout owner */
+  /* ok */
 }
 
-/* HEADER DE LA PAGE */
 .owner-appointments__header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  gap: 18px;
   margin-bottom: 1.5rem;
-
-  h1 {
-    font-size: 1.6rem;
-    margin-bottom: 0.25rem;
-    color: $color-text-main;
-  }
-
-  p {
-    font-size: 0.9rem;
-    color: $color-text-muted;
-  }
 }
 
-.owner-appointments__header-actions {
+.owner-appointments__headerLeft {
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+  min-width: 320px;
+}
+
+.owner-appointments__headerRight {
+  display: flex;
   justify-content: flex-end;
   align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  flex: 1;
 }
 
-/* Champ date */
-//.owner-appointments__search,
-//.owner-appointments__select,
-//.owner-appointments__date-input {
-//  height: 40px;
-//  padding: 0 12px;
-//  border-radius: 12px;
-//  border: 1px solid rgb(66, 87, 128);
-//  background-color: #406280;
-//  color: #e5e7eb;
-//  outline: none;
-//
-//  &:focus {
-//    border-color: rgba(59, 130, 246, 0.75);
-//    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.18);
-//  }
-//}
-
+/* même hauteur / style pour tout */
 .owner-appointments__search,
 .owner-appointments__select,
 .owner-appointments__date-input,
 .owner-appointments__add-btn,
 .owner-appointments__sort-btn {
-  height: 40px;
+  height: 44px;
   padding: 0 14px;
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1px solid rgba(59, 130, 246, 0.55);
   background: rgba(29, 78, 216, 0.9);
   color: #fff;
   font-weight: 600;
   cursor: pointer;
 
-  &:hover {
-    filter: brightness(0.95);
+  &:hover { filter: brightness(0.95); }
+}
+
+/* le champ recherche prend + de place */
+.owner-appointments__search {
+  width: 280px;
+  min-width: 220px;
+}
+
+/* selects un peu plus larges */
+.owner-appointments__select {
+  min-width: 210px;
+}
+
+/* bouton tri compact */
+.owner-appointments__sort-btn {
+  padding: 0 16px;
+}
+
+/* responsive : passe proprement en colonne */
+@media (max-width: 900px) {
+  .owner-appointments__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .owner-appointments__headerLeft {
+    justify-content: space-between;
+  }
+
+  .owner-appointments__headerRight {
+    justify-content: flex-start;
+  }
+
+  .owner-appointments__search {
+    width: 100%;
+    min-width: 0;
   }
 }
 
-/* Bouton nouveau RDV */
-//.owner-appointments__add-btn {
-//  border: none;
-//  border-radius: 999px;
-//  padding: 0.45rem 1rem;
-//  font-size: 0.85rem;
-//  font-weight: 500;
-//  color: #ffffff;
-//  background: linear-gradient(135deg, #4f46e5, #6366f1);
-//  cursor: pointer;
-//  box-shadow: 0 14px 32px rgba(79, 70, 229, 0.6);
-//}
+.owner-appointments__error {
+  color: #b91c1c;
+  margin: 0.5rem 0 1rem;
+}
 
-/* CONTENU PRINCIPAL : timeline + cartes */
-.owner-appointments__content {
-  display: grid;
-  grid-template-columns: 120px 1fr;
-  gap: 1rem;
-  padding: 1rem;
+/* ========================= */
+/* CALENDRIER SEMAINE (image2) */
+/* ========================= */
+
+.owner-cal {
   border-radius: 18px;
-  background: #f9fafb; /*  fond clair */
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.35);
-}
-
-/* Colonne des heures */
-.owner-appointments__time-column {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.owner-appointments__time-slot {
-  height: 60px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  padding-right: 0.5rem;
-  font-size: 0.8rem;
-  color: #6b7280;
-}
-
-/* Colonne de droite : cartes */
-.owner-appointments__cards-column {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-/* Carte de rendez-vous */
-.owner-appointments__card {
-  display: grid;
-  grid-template-columns: 140px 1fr;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  border-radius: 14px;
   background: #ffffff;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 10px 26px rgba(148, 163, 184, 0.35);
+  border: 1px solid rgba(209, 213, 219, 0.8);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
 }
 
-.owner-appointments__card-time {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #4b5563;
+/* Header jours */
+.owner-cal__head {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  background: rgba(29, 78, 216, 0.95);
+  color: #fff;
 }
 
-.owner-appointments__card-main {
+.owner-cal__head-left {
+  height: 58px;
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.owner-cal__head-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  height: 58px;
+}
+
+.owner-cal__head-day {
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
+  justify-content: center;
+  gap: 2px;
+  padding: 10px 8px;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-.owner-appointments__card-service {
+.owner-cal__dow {
+  font-size: 0.78rem;
+  opacity: 0.9;
+  text-transform: capitalize;
+}
+
+.owner-cal__date {
   font-size: 0.95rem;
-  font-weight: 600;
-  color: #111827;
+  font-weight: 800;
 }
 
-.owner-appointments__card-client {
-  font-size: 0.85rem;
-  color: #374151;
+/* Body */
+.owner-cal__body {
+  display: grid;
+  grid-template-columns: 72px 1fr;
 }
 
-.owner-appointments__card-stylist {
-  font-size: 0.8rem;
-  color: #6b7280;
+/* Heures */
+.owner-cal__hours {
+  position: relative;
+  background: #f8fafc;
+  border-right: 1px solid #e5e7eb;
 }
 
-/* Message quand il n'y a pas de rendez-vous */
-.owner-appointments__empty {
-  font-size: 0.9rem;
-  color: #6b7280;
-  padding: 1rem;
-  background: #f3f4f6;
+.owner-cal__hour {
+  height: 120px; /* 60min * 2px/min => 120px */
+  padding: 8px 8px 0 0;
+  text-align: right;
+  font-size: 0.75rem;
+  color: #64748b;
+  box-sizing: border-box;
+  border-bottom: 1px solid #eef2f7;
+}
+
+/* Grille 7 jours */
+.owner-cal__grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  background: #fff;
+}
+
+.owner-cal__dayCol {
+  position: relative;
+  border-left: 1px solid #eef2f7;
+}
+
+/* lignes 30 min */
+.owner-cal__slotLine {
+  height: 60px; /* 30min * 2px/min => 60px */
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* Layer events */
+.owner-cal__eventsLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none; /* la grille reste scrollable; on peut repasser en true si tu veux cliquer */
+}
+
+/* Event card (comme image2) */
+.owner-cal__event {
+  position: absolute;
+  pointer-events: auto;
+  background: #ffffff;
   border-radius: 12px;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.10);
+  padding: 8px 10px;
+  overflow: hidden;
+
+  /* barre accent à gauche */
+  box-sizing: border-box;
 }
 
-/* Responsive : sur petits écrans owner */
+.owner-cal__event::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, #6366f1, #4f46e5);
+}
+
+.owner-cal__eventTime {
+  font-size: 0.78rem;
+  color: #334155;
+  font-weight: 700;
+  margin-left: 6px;
+}
+
+.owner-cal__eventTitle {
+  margin-top: 2px;
+  margin-left: 6px;
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #0f172a;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.owner-cal__eventSub {
+  margin-top: 2px;
+  margin-left: 6px;
+  font-size: 0.78rem;
+  color: #64748b;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.owner-cal__empty {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #64748b;
+  border: 1px dashed #cbd5e1;
+}
+
+/* Responsive */
 @media (max-width: $breakpoint-md) {
-  .owner-appointments__content {
-    grid-template-columns: 1fr;
+  .owner-appointments__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
   }
 
-  .owner-appointments__card {
-    grid-template-columns: 1fr;
+  .owner-appointments__header-actions {
+    justify-content: flex-start;
+  }
+
+  .owner-cal__head {
+    grid-template-columns: 60px 1fr;
+  }
+
+  .owner-cal__body {
+    grid-template-columns: 60px 1fr;
+  }
+
+  .owner-cal__eventTitle {
+    font-size: 0.85rem;
   }
 }
