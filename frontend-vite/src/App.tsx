@@ -22,6 +22,7 @@ import OwnerStatsPage from "./pages/Owner/OwnerStatsPage";
 import OwnerClientsPage from "./pages/Owner/OwnerClientsPage";
 import OwnerTeamPage from "./pages/Owner/OwnerTeamPage.tsx";
 import OwnerPromotionsPage from "./pages/Owner/OwnerPromotionsPage";
+import OwnerStaffPlanningPage from "./pages/Owner/OwnerStaffPlanningPage.tsx";
 
 const App: React.FC = () => {
     return (
@@ -119,6 +120,15 @@ const App: React.FC = () => {
                     </RequireAuth>
                 }
             />
+            <Route
+                path="/owner/team/:id/planning"
+                element={
+                    <RequireAuth allowedRoles={["owner"]}>
+                        <OwnerStaffPlanningPage />
+                    </RequireAuth>
+                }
+            />
+
             <Route
                 path="/owner/promotions"
                 element={

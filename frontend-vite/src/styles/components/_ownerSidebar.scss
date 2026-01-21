@@ -1,78 +1,120 @@
 // FRONTEND - src/styles/components/_ownerSidebar.scss
-
-@use '../variables' as *;
+@use "../variables" as *;
 
 .owner-sidebar {
   position: sticky;
-  top: 25px;
+  top: 0;
   height: 100vh;
-  width: 260px;
+  width: 270px;
   display: flex;
   flex-direction: column;
-  padding: 1.75rem 1.25rem;
-  background: $color-bg-sidebar;
+  padding: 1.5rem 1.1rem;
+
+  // ✅ Dégradé subtil (Devias-like)
+  background: linear-gradient(180deg, #0b1220 0%, #0a1020 45%, #070b14 100%);
+
   color: $color-text-invert;
-  border-right: 1px solid rgba(15, 23, 42, 0.9);
-  //box-shadow: 16px 0 40px rgba(15, 23, 42, 0.8);
+  border-right: 1px solid rgba(148, 163, 184, 0.12);
 }
-//.owner-sidebar__brand {
-//  display: flex;              // ✅active le flex
-//  flex-direction: column;     //  empile verticalement
-//  justify-content: center;    //  centre verticalement
-//  line-height: 1.1;           //  évite l’effet "écrasé"
-//}
+
+.owner-sidebar__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.25rem 0.25rem 1.25rem;
+}
+
+.owner-sidebar__logo-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, $color-primary, $color-accent);
+  box-shadow: 0 0 18px rgba(99, 102, 241, 0.55);
+}
+
+.owner-sidebar__brand {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
 .owner-sidebar__brand-title {
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 1.05rem;
+  font-weight: 800;
   color: $color-text-invert;
-  margin-right:10px;
 }
 
 .owner-sidebar__brand-subtitle {
   font-size: 0.75rem;
-  color: rgba(148, 163, 184, 0.9);
-  margin-top: 2px;
+  color: rgba(148, 163, 184, 0.85);
+  margin-top: 3px;
+}
+
+.owner-sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
 }
 
 .owner-sidebar__item {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.6rem 0.8rem;
-  border-radius: 0.9rem;
-  font-size: 0.9rem;
-  color: rgba(209, 213, 219, 0.9);
+  padding: 0.65rem 0.85rem;
+  border-radius: 14px;
+  font-size: 0.92rem;
+  font-weight: 600;
+
+  color: rgba(226, 232, 240, 0.86);
   text-decoration: none;
-  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+
+  //  look Devias
+  background: transparent;
+  border: 1px solid transparent;
+
+  transition: background 0.15s ease, border-color 0.15s ease,
+  transform 0.08s ease, color 0.15s ease;
+}
+
+.owner-sidebar__icon {
+  display: inline-flex;
+  font-size: 1.05rem;
+  opacity: 0.95;
 }
 
 .owner-sidebar__item:hover {
-  background: rgba(148, 163, 184, 0.16);
+  background: rgba(148, 163, 184, 0.10);
+  border-color: rgba(148, 163, 184, 0.14);
   color: #ffffff;
   transform: translateX(2px);
 }
 
 .owner-sidebar__item--active {
-  background: linear-gradient(90deg, $color-primary, $color-accent);
+  //  actif plus "clean"
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.30), rgba(99, 102, 241, 0.25));
+  border-color: rgba(99, 102, 241, 0.30);
   color: #ffffff;
-  box-shadow: 0 0 30px rgba(79, 70, 229, 0.7);
+  box-shadow: 0 10px 28px rgba(59, 130, 246, 0.18);
 }
+
 .owner-sidebar__nav--bottom {
-  margin-top: auto; //  FORCE le bloc tout en bas
-  padding-top: 1.25rem;
-    padding-bottom: 3.5rem;
-  border-top: 1px solid rgb(255, 255, 255);
+  margin-top: auto;
+  padding-top: 1rem;
+  padding-bottom: 1.25rem;
+
+  //  séparation douce (pas blanc)
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
 }
 
-/*  Style spécial pour le bouton Déconnexion */
-
-.owner-sidebar__nav--bottom .owner-sidebar__item:last-child {
-  background: rgba(20, 45, 90, 0.29); //
-  color: #ffffff;
+.owner-sidebar__logout {
+  width: 100%;
+  text-align: left;
+  background: rgba(148, 163, 184, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.14);
 }
 
-.owner-sidebar__nav--bottom .owner-sidebar__item:last-child:hover {
-  background: rgba(239, 68, 68, 0.35);
-  color: white;
-  //box-shadow: 0 0 14px rgba(239, 68, 68, 0.5);
+.owner-sidebar__logout:hover {
+  background: rgba(239, 68, 68, 0.18);
+  border-color: rgba(239, 68, 68, 0.28);
+  color: #fff;
 }
