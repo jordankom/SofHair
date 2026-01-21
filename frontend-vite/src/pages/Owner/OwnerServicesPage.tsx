@@ -1,11 +1,16 @@
-// FRONTEND
-// Page Prestations (owner) + ajout d'une prestation
-
 import React, { useEffect, useMemo, useState } from "react";
 import OwnerSidebar from "../../components/layout/OwnerSidebar";
 import "../../styles/pages/_ownerServices.scss";
 
-import { fetchServices, createService, type Service, type CreateServicePayload } from "../../services/servicesApi";
+import {
+    fetchServices,
+    createService,
+    updateService,
+    deleteService,
+    type Service,
+    type CreateServicePayload,
+} from "../../services/servicesApi";
+
 import OwnerServiceFormModal from "../../components/ui/OwnerServiceFormModal";
 
 const OwnerServicesPage: React.FC = () => {
@@ -14,10 +19,15 @@ const OwnerServicesPage: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    //  contrôle modal
-    const [openCreate, setOpenCreate] = useState(false);
+    //  modal create/edit
+    const [openForm, setOpenForm] = useState(false);
+    const [editTarget, setEditTarget] = useState<Service | null>(null);
 
-    //  fonction de refresh (réutilisable après création)
+    // confirmation delete
+    const [deleteTarget, setDeleteTarget] = useState<Service | null>(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
+    const [deleteError, setDeleteError] = useState<string | null>(null);
+
     const loadServices = async () => {
         try {
             setLoading(true);
@@ -36,29 +46,62 @@ const OwnerServicesPage: React.FC = () => {
         loadServices();
     }, []);
 
-    const categories = useMemo(
-        () => Array.from(new Set(services.map((s) => s.category))),
-        [services]
-    );
+    const categories = useMemo(() => Array.from(new Set(services.map((s) => s.category))), [services]);
 
     const filteredServices = useMemo(() => {
         if (selectedCategory === "Toutes") return services;
         return services.filter((s) => s.category === selectedCategory);
     }, [services, selectedCategory]);
 
-    const handleDelete = (id: string) => {
-        const confirmDelete = window.confirm("Supprimer cette prestation ?");
-        if (!confirmDelete) return;
-
-        setServices((prev) => prev.filter((service) => service._id !== id));
-        // PLUS TARD : DELETE backend
+    //  open create
+    const openCreate = () => {
+        setEditTarget(null);
+        setOpenForm(true);
     };
 
-    //  création : on POST puis on refresh
-    const handleCreate = async (payload: CreateServicePayload) => {
-        await createService(payload);
-        await loadServices(); //  recharge la grille immédiatement
+    //  open edit
+    const openEdit = (s: Service) => {
+        setEditTarget(s);
+        setOpenForm(true);
     };
+
+    //  submit create or update
+    const handleSubmit = async (payload: CreateServicePayload) => {
+        if (editTarget?._id) {
+            await updateService(editTarget._id, payload);
+        } else {
+            await createService(payload);
+        }
+        await loadServices();
+    };
+
+    //  delete confirm
+    const askDelete = (s: Service) => {
+        setDeleteError(null);
+        setDeleteTarget(s);
+    };
+
+    const confirmDelete = async () => {
+        if (!deleteTarget?._id) return;
+
+        try {
+            setDeleteLoading(true);
+            setDeleteError(null);
+
+            console.log("[DELETE] sending:", deleteTarget._id);
+            await deleteService(deleteTarget._id);
+            console.log("[DELETE] success");
+
+            setDeleteTarget(null);
+            await loadServices();
+        } catch (e: any) {
+            console.error("[DELETE] error:", e);
+            setDeleteError(e?.response?.data?.message || e?.message || "Erreur lors de la suppression.");
+        } finally {
+            setDeleteLoading(false);
+        }
+    };
+
 
     return (
         <div className="owner-layout">
@@ -85,10 +128,7 @@ const OwnerServicesPage: React.FC = () => {
                             ))}
                         </select>
 
-                        <button
-                            className="owner-services__add-btn"
-                            onClick={() => setOpenCreate(true)}
-                        >
+                        <button className="owner-services__add-btn" onClick={openCreate}>
                             + Ajouter une prestation
                         </button>
                     </div>
@@ -102,7 +142,11 @@ const OwnerServicesPage: React.FC = () => {
                         {filteredServices.map((service) => (
                             <article key={service._id} className="owner-services__card">
                                 <div className="owner-services__image-wrapper">
-                                    <img src={service.imageUrl} alt={service.name} />
+                                    {service.imageUrl ? (
+                                        <img src={service.imageUrl} alt={service.name} />
+                                    ) : (
+                                        <div className="owner-services__image-fallback">Image</div>
+                                    )}
                                 </div>
 
                                 <div className="owner-services__info">
@@ -114,8 +158,10 @@ const OwnerServicesPage: React.FC = () => {
                                 </div>
 
                                 <div className="owner-services__actions">
-                                    <button className="edit-btn">Modifier</button>
-                                    <button className="delete-btn" onClick={() => handleDelete(service._id)}>
+                                    <button className="edit-btn" onClick={() => openEdit(service)}>
+                                        Modifier
+                                    </button>
+                                    <button className="delete-btn" onClick={() => askDelete(service)}>
                                         Supprimer
                                     </button>
                                 </div>
@@ -130,12 +176,42 @@ const OwnerServicesPage: React.FC = () => {
                     </section>
                 )}
 
-                {/*  Modal création */}
+                {/*  Modal create/edit */}
                 <OwnerServiceFormModal
-                    open={openCreate}
-                    onClose={() => setOpenCreate(false)}
-                    onSubmit={handleCreate}
+                    open={openForm}
+                    onClose={() => setOpenForm(false)}
+                    onSubmit={handleSubmit}
+                    initialService={editTarget}
                 />
+
+                {/*  Modal confirmation delete (moderne) */}
+                {deleteTarget && (
+                    <div className="owner-confirm__backdrop" onClick={() => setDeleteTarget(null)}>
+                        <div className="owner-confirm" onClick={(e) => e.stopPropagation()}>
+                            <div className="owner-confirm__header">
+                                <h3>Supprimer la prestation ?</h3>
+                                <button className="owner-confirm__close" onClick={() => setDeleteTarget(null)} aria-label="Fermer">
+                                    ✕
+                                </button>
+                            </div>
+
+                            <p className="owner-confirm__text">
+                                Vous êtes sur le point de supprimer <strong>{deleteTarget.name}</strong>. Cette action est irréversible.
+                            </p>
+
+                            {deleteError && <p className="owner-confirm__error">{deleteError}</p>}
+
+                            <div className="owner-confirm__actions">
+                                <button className="owner-confirm__btn owner-confirm__btn--ghost" onClick={() => setDeleteTarget(null)} disabled={deleteLoading}>
+                                    Annuler
+                                </button>
+                                <button className="owner-confirm__btn owner-confirm__btn--danger" onClick={confirmDelete} disabled={deleteLoading}>
+                                    {deleteLoading ? "Suppression..." : "Supprimer"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </main>
         </div>
     );
