@@ -68,7 +68,6 @@ async function main() {
         "Waves",
     ];
 
-    // ⚠️ si tu veux repartir à zéro à chaque fois :
     // await ServiceModel.deleteMany({});
     // console.log("🧹 Prestations supprimées");
 
@@ -85,8 +84,7 @@ async function main() {
             const price = rand(15, 150);
             const durationMinutes = pick([15, 30, 45, 60, 75, 90, 120]);
 
-            // imageUrl : mets un placeholder stable (ou tes images plus tard)
-            // Si tu veux une image différente par service :
+            // une image différente par service :
             const imageUrl = `https://picsum.photos/seed/softhair-${existingCount + i}/800/600`;
 
             return {

@@ -182,29 +182,37 @@ const Rdvs: React.FC = () => {
      * BookingModal renvoie : { serviceId, dateTimeISO }
      * -> pour report on a seulement besoin de dateTimeISO
      */
-    const confirmReschedule = async (payload: { serviceId: string; dateTimeISO: string }) => {
+    const confirmReschedule = async (
+        payload: { serviceId: string; dateTimeISO: string; staffId: string }
+    ) => {
         if (!rescheduleTarget) return;
 
         try {
             setReschedulingId(rescheduleTarget._id);
             setError(null);
 
-            await rescheduleAppointment(rescheduleTarget._id, { dateTimeISO: payload.dateTimeISO });
-            showToast("Rendez-vous reporté avec succès ");
-            // Fermer le modal
+            await rescheduleAppointment(
+                rescheduleTarget._id,
+                {
+                    dateTimeISO: payload.dateTimeISO,
+                    staffId: payload.staffId, // ✅ B : envoyé au backend
+                }
+            );
+
+            showToast("Rendez-vous reporté avec succès");
             setOpenReschedule(false);
             setRescheduleTarget(null);
-
-            // Refresh liste
             await refresh();
         } catch (e: any) {
-            const msg = e?.response?.data?.message || "Impossible de reporter ce rendez-vous.";
+            const msg =
+                e?.response?.data?.message ||
+                "Impossible de reporter ce rendez-vous.";
             setError(msg);
-            // On garde le modal ouvert si besoin
         } finally {
             setReschedulingId(null);
         }
     };
+
 
     /**
      * Construit un objet compatible avec BookingModal (ServiceItem)
@@ -460,6 +468,7 @@ const Rdvs: React.FC = () => {
             <BookingModal
                 open={openReschedule}
                 service={bookingService}
+                initialStaffId={rescheduleTarget?.staffId ?? null}
                 onClose={() => {
                     setOpenReschedule(false);
                     setRescheduleTarget(null);

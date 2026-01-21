@@ -18,7 +18,8 @@ app.use(cors({
     origin: [
         "https://softhair-41140.web.app",
         "https://softhair-41140.firebaseapp.com",
-        "https://softhair.site"
+        "https://softhair.site",
+        "http://localhost:5173"
     ],
     credentials: false, // true uniquement si cookies
 }));

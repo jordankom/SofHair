@@ -1,18 +1,17 @@
-// FRONTEND
-// Appels API RDV : disponibilités + création
-
 import { apiClient } from "./apiClient";
 
 export type AvailabilityItem = {
     dateTimeISO: string;
     available: boolean;
 };
-//  Type  pour afficher la liste
+
 export type MyAppointment = {
     _id: string;
     startAt: string;
     endAt: string;
     status: "booked" | "cancelled";
+    rescheduleCount?: number;
+    staffId?: string; // (si tu veux l'afficher + tard)
     serviceId: {
         _id: string;
         name: string;
@@ -23,38 +22,36 @@ export type MyAppointment = {
         imageUrl?: string;
     } | null;
 };
-export async function getAvailability(dateYYYYMMDD: string) {
+
+//  dispo par coiffeur
+export async function getAvailability(dateYYYYMMDD: string, staffId: string) {
     const res = await apiClient.get<AvailabilityItem[]>("/appointments/availability", {
-        params: { date: dateYYYYMMDD },
+        params: { date: dateYYYYMMDD, staffId },
     });
     return res.data;
 }
 
-export async function createAppointment(payload: { serviceId: string; dateTimeISO: string }) {
+// création rdv avec coiffeur
+export async function createAppointment(payload: { serviceId: string; dateTimeISO: string; staffId: string }) {
     const res = await apiClient.post("/appointments", payload);
     return res.data;
 }
 
-/**
- * GET /appointments/my
- * Renvoie la liste des RDV de l'utilisateur connecté
- */
 export async function getMyAppointments() {
     const res = await apiClient.get<MyAppointment[]>("/appointments/my");
     return res.data;
 }
 
-/**
- * PATCH /appointments/:id/cancel
- * Annule un RDV du client connecté
- */
 export async function cancelAppointment(appointmentId: string) {
     const res = await apiClient.patch(`/appointments/${appointmentId}/cancel`);
     return res.data;
 }
 
-// Déplacer un RDV vers un nouveau créneau
-export async function rescheduleAppointment(appointmentId: string, payload: { dateTimeISO: string }) {
+// ✅ report : staffId optionnel => si tu veux changer le coiffeur (B)
+export async function rescheduleAppointment(
+    appointmentId: string,
+    payload: { dateTimeISO: string; staffId?: string }
+) {
     const res = await apiClient.patch(`/appointments/${appointmentId}/reschedule`, payload);
     return res.data;
 }
