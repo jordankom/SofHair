@@ -5,20 +5,12 @@ import { useAuth } from "../../context/AuthContext";
 import "../../styles/pages/_clientSettings.scss";
 
 /**
- * Page Paramètres client (version pro)
- * - Affiche les infos basiques depuis AuthContext
- * - Permet de se déconnecter (nettoyage sessionStorage via AuthContext.logout)
- * - Prépare la place pour ajouter : profil, mot de passe, préférences, etc.
+ * Page Paramètres client (full width)
  */
 const ClientSettingsPage: React.FC = () => {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
 
-    /**
-     * Déconnexion :
-     * - nettoie le contexte + sessionStorage
-     * - redirige vers la landing
-     */
     const handleLogout = () => {
         logout();
         navigate("/");
@@ -34,11 +26,9 @@ const ClientSettingsPage: React.FC = () => {
                 </div>
             </div>
 
-            <div className="client-settings__grid">
-                {/* ===================== */}
-                {/* Profil */}
-                {/* ===================== */}
-                <Card className="client-settings__card">
+            {/*  remplace la grid par une seule zone full width */}
+            <div className="client-settings__content">
+                <Card className="client-settings__card client-settings__card--full">
                     <div className="client-settings__cardHeader">
                         <h2>Mon profil</h2>
                         <span className="client-pill client-pill--soft">Compte</span>
@@ -66,7 +56,6 @@ const ClientSettingsPage: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Actions */}
                     <div className="client-settings__actions">
                         <button
                             className="client-btn client-btn--ghost"
@@ -86,25 +75,8 @@ const ClientSettingsPage: React.FC = () => {
                     </div>
                 </Card>
 
-                {/* ===================== */}
-                {/* Sécurité (placeholder) */}
-                {/* ===================== */}
-                <Card className="client-settings__card">
-                    <div className="client-settings__cardHeader">
-                        <h2>Sécurité</h2>
-                        <span className="client-pill">Bientôt</span>
-                    </div>
-
-                    <p className="client-settings__hint">
-                        Ici tu pourras bientôt modifier ton mot de passe et gérer la sécurité de ton compte.
-                    </p>
-
-                    <div className="client-settings__actions">
-                        <button className="client-btn client-btn--primary" disabled title="À venir">
-                            Changer le mot de passe
-                        </button>
-                    </div>
-                </Card>
+                {/*  ton bloc sécurité reste prêt si tu veux le remettre,
+                    mais là tu veux une page pleine donc on le laisse commenté */}
             </div>
         </div>
     );

@@ -24,11 +24,17 @@
   }
 }
 
-/* Grid de cartes */
-.client-settings__grid {
-  display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+/*  remplace la grid par une zone pleine largeur */
+.client-settings__content {
+  width: 100%;
+  max-width: 980px;        /*  largeur "pro" centrée */
+  margin: 0 auto;
+  display: block;
+}
+
+/* carte pleine largeur */
+.client-settings__card--full {
+  width: 100%;
 }
 
 @media (max-width: 900px) {
@@ -36,8 +42,8 @@
     padding: 18px 14px;
   }
 
-  .client-settings__grid {
-    grid-template-columns: 1fr;
+  .client-settings__content {
+    max-width: 100%;
   }
 }
 
@@ -89,13 +95,6 @@
   font-weight: 700;
 }
 
-/* Texte d’aide */
-.client-settings__hint {
-  margin: 0 0 14px;
-  color: #475569;
-  line-height: 1.5;
-}
-
 /* Actions */
 .client-settings__actions {
   display: flex;
@@ -104,10 +103,6 @@
   margin-top: 8px;
 }
 
-/**
- * Boutons :
- * Ici on ajoute juste une variante "danger" cohérente.
- */
 .client-btn--danger {
   background: #ef4444;
   color: #fff;

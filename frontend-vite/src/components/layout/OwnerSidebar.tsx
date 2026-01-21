@@ -24,9 +24,10 @@ import '../../styles/components/_ownerSidebar.scss';
 interface SidebarItem {
     label: string;
     icon: React.ReactNode;
-    to?: string;          // certaines entrées n’ont pas de route (ex: logout)
+    to?: string; // certaines entrées n’ont pas de route (ex: dashboard disabled / logout)
     section?: 'main' | 'bottom';
     action?: () => void; // pour le bouton Déconnexion
+    disabled?: boolean;  // ✅ AJOUT: permet de rendre un item non cliquable
 }
 
 // Composant principal
@@ -36,33 +37,33 @@ const OwnerSidebar: React.FC = () => {
 
     // Fonction de déconnexion propre
     const handleLogout = () => {
-        logout();          // suppression du token + user
+        logout();         // suppression du token + user
         navigate('/');    // retour vers la landing page
     };
 
     // MENU
     const sidebarItems: SidebarItem[] = [
-        // SECTION PRINCIPALE
-        { label: 'Dashboard',    icon: <FiGrid />,       to: '/owner' },
-        { label: 'Rendez-vous', icon: <FiCalendar />,   to: '/owner/appointments' },
-        { label: 'Clients',      icon: <FiUsers />,      to: '/owner/clients' },
-        { label: 'Équipe',       icon: <FiUserCheck />,  to: '/owner/team' },
-        { label: 'Prestations', icon: <FiScissors />,   to: '/owner/prestations' },
-        { label: 'Promotions',  icon: <FiGift />,       to: '/owner/promotions' },
-        { label: 'Statistiques',icon: <FiBarChart2 />,  to: '/owner/stats' },
+        // ✅ MODIF: Dashboard devient "disabled" et n'a plus de "to"
+        { label: 'Dashboard', icon: <FiGrid />, disabled: true },
+
+        { label: 'Rendez-vous', icon: <FiCalendar />, to: '/owner/appointments' },
+        { label: 'Clients', icon: <FiUsers />, to: '/owner/clients' },
+        { label: 'Équipe', icon: <FiUserCheck />, to: '/owner/team' },
+        { label: 'Prestations', icon: <FiScissors />, to: '/owner/prestations' },
+        { label: 'Promotions', icon: <FiGift />, to: '/owner/promotions' },
+        { label: 'Statistiques', icon: <FiBarChart2 />, to: '/owner/stats' },
 
         // SECTION BASSE
-        { label: 'Paramètres',  icon: <FiSettings />,   to: '/owner/settings', section: 'bottom' },
-        { label: 'Déconnexion',icon: <FiLogOut />,      section: 'bottom', action: handleLogout },
+        { label: 'Paramètres', icon: <FiSettings />, to: '/owner/settings', section: 'bottom' },
+        { label: 'Déconnexion', icon: <FiLogOut />, section: 'bottom', action: handleLogout },
     ];
 
     // Séparation haut / bas
-    const mainItems = sidebarItems.filter(item => item.section !== 'bottom');
-    const bottomItems = sidebarItems.filter(item => item.section === 'bottom');
+    const mainItems = sidebarItems.filter((item) => item.section !== 'bottom');
+    const bottomItems = sidebarItems.filter((item) => item.section === 'bottom');
 
     return (
         <aside className="owner-sidebar">
-
             {/* LOGO / TITRE */}
             <div className="owner-sidebar__header">
                 <div className="owner-sidebar__logo-dot" />
@@ -74,28 +75,45 @@ const OwnerSidebar: React.FC = () => {
 
             {/* MENU PRINCIPAL */}
             <nav className="owner-sidebar__nav owner-sidebar__nav--main">
-                {mainItems.map(item => (
-                    <NavLink
-                        key={item.label}
-                        to={item.to!}
-                        className={({ isActive }) =>
-                            `owner-sidebar__item ${isActive ? 'owner-sidebar__item--active' : ''}`
-                        }
-                    >
-                        <span className="owner-sidebar__icon">{item.icon}</span>
-                        <span className="owner-sidebar__label">{item.label}</span>
-                    </NavLink>
-                ))}
+                {mainItems.map((item) => {
+                    // ✅ AJOUT: si disabled, on rend un bloc non cliquable (pas NavLink)
+                    if (item.disabled) {
+                        return (
+                            <div
+                                key={item.label}
+                                className="owner-sidebar__item owner-sidebar__item--disabled"
+                            >
+                                <span className="owner-sidebar__icon">{item.icon}</span>
+                                <span className="owner-sidebar__label">{item.label}</span>
+                            </div>
+                        );
+                    }
+
+                    // ✅ MODIF: on évite item.to! dangereux
+                    return (
+                        <NavLink
+                            key={item.label}
+                            to={item.to ?? '#'}
+                            className={({ isActive }) =>
+                                `owner-sidebar__item ${isActive ? 'owner-sidebar__item--active' : ''}`
+                            }
+                        >
+                            <span className="owner-sidebar__icon">{item.icon}</span>
+                            <span className="owner-sidebar__label">{item.label}</span>
+                        </NavLink>
+                    );
+                })}
             </nav>
 
             {/* MENU BAS */}
             <nav className="owner-sidebar__nav owner-sidebar__nav--bottom">
-                {bottomItems.map(item => (
+                {bottomItems.map((item) =>
                     item.action ? (
                         <button
                             key={item.label}
                             onClick={item.action}
                             className="owner-sidebar__item owner-sidebar__logout"
+                            type="button"
                         >
                             <span className="owner-sidebar__icon">{item.icon}</span>
                             <span className="owner-sidebar__label">{item.label}</span>
@@ -103,7 +121,7 @@ const OwnerSidebar: React.FC = () => {
                     ) : (
                         <NavLink
                             key={item.label}
-                            to={item.to!}
+                            to={item.to ?? '#'} // ✅ MODIF: évite item.to! (sécurité)
                             className={({ isActive }) =>
                                 `owner-sidebar__item ${isActive ? 'owner-sidebar__item--active' : ''}`
                             }
@@ -112,9 +130,8 @@ const OwnerSidebar: React.FC = () => {
                             <span className="owner-sidebar__label">{item.label}</span>
                         </NavLink>
                     )
-                ))}
+                )}
             </nav>
-
         </aside>
     );
 };
