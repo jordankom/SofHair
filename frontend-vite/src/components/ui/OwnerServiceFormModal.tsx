@@ -1,19 +1,21 @@
-// FRONTEND
-// Modal + formulaire pour créer une prestation côté owner
-
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "../../styles/components/_ownerServiceModal.scss";
-import type { CreateServicePayload } from "../../services/servicesApi";
+import type { CreateServicePayload, Service } from "../../services/servicesApi";
 
 type Props = {
-    open: boolean; // contrôle affichage
-    onClose: () => void; // fermer modal
-    onSubmit: (payload: CreateServicePayload) => Promise<void>; // création + refresh
+    open: boolean;
+    onClose: () => void;
+
+    //  si présent => mode EDIT
+    initialService?: Service | null;
+
+
+    onSubmit: (payload: CreateServicePayload) => Promise<void>;
+
 };
 
-const OwnerServiceFormModal: React.FC<Props> = ({ open, onClose, onSubmit }) => {
-    // Si pas ouvert, on ne rend rien (évite de polluer le DOM)
-    if (!open) return null;
+const OwnerServiceFormModal: React.FC<Props> = ({ open, onClose, onSubmit, initialService }) => {
+    const isEdit = !!initialService?._id;
 
     // Champs du formulaire
     const [name, setName] = useState("");
@@ -27,11 +29,39 @@ const OwnerServiceFormModal: React.FC<Props> = ({ open, onClose, onSubmit }) => 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    //  quand on ouvre / change de service => préremplir
+    useEffect(() => {
+        if (!open) return;
+
+        if (initialService) {
+            setName(initialService.name ?? "");
+            setCategory(initialService.category ?? "");
+            setPrice(typeof initialService.price === "number" ? initialService.price : 25);
+            setDurationMinutes(
+                typeof initialService.durationMinutes === "number" ? initialService.durationMinutes : 30
+            );
+            setDescription((initialService as any).description ?? "");
+            setImageUrl(initialService.imageUrl ?? "");
+            setError(null);
+            return;
+        }
+
+        // mode création
+        setName("");
+        setCategory("");
+        setPrice(25);
+        setDurationMinutes(30);
+        setDescription("");
+        setImageUrl("");
+        setError(null);
+    }, [open, initialService?._id]);
+
+    const title = useMemo(() => (isEdit ? "Modifier la prestation" : "Ajouter une prestation"), [isEdit]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
 
-        // mini validation
         if (!name.trim() || !category.trim()) {
             setError("Veuillez remplir au minimum le nom et la catégorie.");
             return;
@@ -40,46 +70,41 @@ const OwnerServiceFormModal: React.FC<Props> = ({ open, onClose, onSubmit }) => 
         try {
             setLoading(true);
 
-            await onSubmit({
+            const payload: CreateServicePayload = {
                 name: name.trim(),
                 category: category.trim(),
                 price,
                 durationMinutes,
                 description: description.trim() || undefined,
                 imageUrl: imageUrl.trim() || undefined,
-            });
+            };
 
-            //  après création : reset champs
-            setName("");
-            setCategory("");
-            setDescription("");
-            setImageUrl("");
-            setPrice(25);
-            setDurationMinutes(30);
+            await onSubmit(payload);
 
-            //  fermer
-            //onClose();
+            //  en edit : on ferme direct
+            // en create : on ferme aussi (plus clean)
+            onClose();
         } catch (e) {
             console.error(e);
-            setError("Erreur lors de la création de la prestation.");
+            setError(isEdit ? "Erreur lors de la modification." : "Erreur lors de la création.");
         } finally {
             setLoading(false);
         }
     };
 
+    if (!open) return null;
+
     return (
         <div className="owner-modal__backdrop" onClick={onClose}>
-            {/* stopPropagation : cliquer dans la boîte ne ferme pas */}
             <div className="owner-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="owner-modal__header">
-                    <h2>Ajouter une prestation</h2>
+                    <h2>{title}</h2>
                     <button className="owner-modal__close" onClick={onClose} aria-label="Fermer">
                         ✕
                     </button>
                 </div>
 
                 <form className="owner-modal__form" onSubmit={handleSubmit}>
-                    {/* Nom */}
                     <label className="owner-modal__label">
                         Nom de la prestation
                         <input
@@ -90,7 +115,6 @@ const OwnerServiceFormModal: React.FC<Props> = ({ open, onClose, onSubmit }) => 
                         />
                     </label>
 
-                    {/* Catégorie */}
                     <label className="owner-modal__label">
                         Catégorie
                         <input
@@ -101,7 +125,6 @@ const OwnerServiceFormModal: React.FC<Props> = ({ open, onClose, onSubmit }) => 
                         />
                     </label>
 
-                    {/* Prix + durée en ligne */}
                     <div className="owner-modal__row">
                         <label className="owner-modal__label">
                             Prix (€)
@@ -128,7 +151,6 @@ const OwnerServiceFormModal: React.FC<Props> = ({ open, onClose, onSubmit }) => 
                         </label>
                     </div>
 
-                    {/* Description */}
                     <label className="owner-modal__label">
                         Description
                         <textarea
@@ -139,7 +161,6 @@ const OwnerServiceFormModal: React.FC<Props> = ({ open, onClose, onSubmit }) => 
                         />
                     </label>
 
-                    {/* Image */}
                     <label className="owner-modal__label">
                         Image (URL)
                         <input
@@ -153,12 +174,17 @@ const OwnerServiceFormModal: React.FC<Props> = ({ open, onClose, onSubmit }) => 
                     {error && <p className="owner-modal__error">{error}</p>}
 
                     <div className="owner-modal__actions">
-                        <button type="button" className="owner-modal__btn owner-modal__btn--ghost" onClick={onClose}>
+                        <button
+                            type="button"
+                            className="owner-modal__btn owner-modal__btn--ghost"
+                            onClick={onClose}
+                            disabled={loading}
+                        >
                             Annuler
                         </button>
 
                         <button type="submit" className="owner-modal__btn owner-modal__btn--primary" disabled={loading}>
-                            {loading ? "Création..." : "Créer"}
+                            {loading ? (isEdit ? "Enregistrement..." : "Création...") : isEdit ? "Enregistrer" : "Créer"}
                         </button>
                     </div>
                 </form>

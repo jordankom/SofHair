@@ -80,3 +80,52 @@ export async function createService(req: Request, res: Response) {
         return res.status(500).json({ message: "Erreur serveur lors de la création." });
     }
 }
+
+//  PATCH /api/services/:id
+export async function updateService(req: Request, res: Response) {
+    try {
+        const id = String(req.params.id || "");
+
+        const { name, category, price, durationMinutes, description, imageUrl, isActive } = req.body;
+
+        // mini validation : si fourni, pas vide
+        const patch: any = {};
+        if (typeof name === "string") patch.name = name.trim();
+        if (typeof category === "string") patch.category = category.trim();
+        if (price != null) patch.price = Number(price);
+        if (durationMinutes != null) patch.durationMinutes = Number(durationMinutes);
+        if (typeof description === "string") patch.description = description.trim() || undefined;
+        if (typeof imageUrl === "string") patch.imageUrl = imageUrl.trim();
+        if (typeof isActive === "boolean") patch.isActive = isActive;
+
+        // garde-fou : au moins un champ
+        if (Object.keys(patch).length === 0) {
+            return res.status(400).json({ message: "Aucune donnée à mettre à jour." });
+        }
+
+        const updated = await ServiceModel.findByIdAndUpdate(id, patch, {
+            new: true,
+            runValidators: true,
+        });
+
+        if (!updated) return res.status(404).json({ message: "Prestation introuvable." });
+
+        return res.json(updated);
+    } catch (e) {
+        console.error("Erreur updateService:", e);
+        return res.status(500).json({ message: "Erreur serveur lors de la modification." });
+    }
+}
+
+//  DELETE /api/services/:id
+export async function deleteService(req: Request, res: Response) {
+    try {
+        const id = String(req.params.id || "");
+        const deleted = await ServiceModel.findByIdAndDelete(id);
+        if (!deleted) return res.status(404).json({ message: "Prestation introuvable." });
+        return res.json({ message: "Prestation supprimée." });
+    } catch (e) {
+        console.error("Erreur deleteService:", e);
+        return res.status(500).json({ message: "Erreur serveur lors de la suppression." });
+    }
+}

@@ -1,15 +1,13 @@
-// BACKEND Modèle Mongoose pour une prestation du salon (Service)
-
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model, Document } from "mongoose";
 
 export interface IService extends Document {
-    name: string;          // Nom de la prestation
-    category: string;      // Catégorie (Coiffure, Coloration, Soin, Homme, etc.)
-    price: number;         // Prix en euros
-    durationMinutes: number; // Durée en minutes
-    description?: string;  // Description optionnelle
-    imageUrl: string;      // URL de l'image
-    isActive: boolean;     // Prestation disponible ou non
+    name: string;
+    category: string;
+    price: number;
+    durationMinutes: number;
+    description?: string;
+    imageUrl: string;
+    isActive: boolean;
 }
 
 const serviceSchema = new Schema<IService>(
@@ -18,13 +16,14 @@ const serviceSchema = new Schema<IService>(
         category: { type: String, required: true },
         price: { type: Number, required: true },
         durationMinutes: { type: Number, required: true },
-        imageUrl: { type: String, required: true },
+
+
+        imageUrl: { type: String, default: "" },
+
         description: { type: String },
         isActive: { type: Boolean, default: true },
     },
-    {
-        timestamps: true,
-    }
+    { timestamps: true }
 );
 
-export const ServiceModel = model<IService>('Service', serviceSchema);
+export const ServiceModel = model<IService>("Service", serviceSchema);
