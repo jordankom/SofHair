@@ -6,18 +6,18 @@
 // - redirige vers /client ou /owner selon le rôle
 // - lien vers la page d'inscription
 
-import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { loginRequest } from '../../services/authService';
-import { useAuth } from '../../context/AuthContext.tsx';
-import TextInput from '../../components/ui/TextInput';
-import Button from '../../components/ui/Button';
-import '../../styles/pages/_auth.scss';
+import React, { useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { loginRequest } from "../../services/authService";
+import { useAuth } from "../../context/AuthContext.tsx";
+import TextInput from "../../components/ui/TextInput";
+import Button from "../../components/ui/Button";
+import "../../styles/pages/_auth.scss";
 
 const LoginPage: React.FC = () => {
     // Champs du formulaire
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
     // États pour l'UX
     const [loading, setLoading] = useState(false);
@@ -29,7 +29,10 @@ const LoginPage: React.FC = () => {
 
     // Si on vient d'une route protégée, on voudra renvoyer l'utilisateur là-bas
     const state = location.state as { from?: string } | undefined;
-    const from = state?.from || '/client';
+
+
+    // Comme ça, après login client tu restes sur la page d’accueil avec le menu "Mon compte".
+    const from = state?.from || "/";
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -43,14 +46,15 @@ const LoginPage: React.FC = () => {
             login(res.token, res.user);
 
             // Redirection selon rôle
-            if (res.user.role === 'owner') {
-                navigate('/owner', { replace: true });
+            if (res.user.role === "owner") {
+                navigate("/owner/appointments", { replace: true });
             } else {
+
                 navigate(from, { replace: true });
             }
         } catch (err: any) {
-            console.error('Erreur login :', err);
-            setError('Email ou mot de passe invalide.');
+            console.error("Erreur login :", err);
+            setError("Email ou mot de passe invalide.");
         } finally {
             setLoading(false);
         }
@@ -60,7 +64,6 @@ const LoginPage: React.FC = () => {
         <div className="auth-page">
             <div className="auth-container">
                 <div className="auth-card">
-
                     <h1 className="auth-title">Connexion à SoftHair</h1>
                     <p className="auth-subtitle">
                         Accédez à votre espace client ou propriétaire du salon.
@@ -88,12 +91,12 @@ const LoginPage: React.FC = () => {
                         {error && <p className="auth-error">{error}</p>}
 
                         <Button type="submit" fullWidth disabled={loading}>
-                            {loading ? 'Connexion...' : 'Se connecter'}
+                            {loading ? "Connexion..." : "Se connecter"}
                         </Button>
                     </form>
 
                     <p className="auth-switch">
-                        Pas encore de compte ?{' '}
+                        Pas encore de compte ?{" "}
                         <Link to="/register" className="auth-link">
                             Créer un compte
                         </Link>

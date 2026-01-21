@@ -10,7 +10,7 @@
   flex-direction: column;
   padding: 1.5rem 1.1rem;
 
-  // ✅ Dégradé subtil (Devias-like)
+  //  Dégradé subtil (Devias-like)
   background: linear-gradient(180deg, #0b1220 0%, #0a1020 45%, #070b14 100%);
 
   color: $color-text-invert;
@@ -117,4 +117,22 @@
   background: rgba(239, 68, 68, 0.18);
   border-color: rgba(239, 68, 68, 0.28);
   color: #fff;
+}
+/* ✅ AJOUT: item désactivé (Dashboard) */
+.owner-sidebar__item--disabled {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: rgba(226, 232, 240, 0.55);
+
+  cursor: default;
+  pointer-events: none; // bloque hover + click
+  transform: none !important;
+}
+
+.owner-sidebar__item--disabled:hover {
+  background: transparent;
+  border-color: transparent;
+  color: rgba(226, 232, 240, 0.55);
+  transform: none;
 }
