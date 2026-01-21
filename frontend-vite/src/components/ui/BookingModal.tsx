@@ -7,46 +7,48 @@ import type { ServiceItem } from "../../services/services.service";
 import { getAvailability, type AvailabilityItem } from "../../services/appointments.service";
 import { getStaff, type StaffItem } from "../../services/staff.service";
 
-/**
- * Props du modal de réservation / report
- */
 type Props = {
     open: boolean;
     service: ServiceItem | null;
 
-    // ✅ si on reporte, on peut pré-sélectionner le coiffeur actuel
+    // si report : pré-sélection coiffeur
     initialStaffId?: string | null;
 
     onClose: () => void;
 
-    // ✅ on renvoie aussi staffId maintenant
+    // renvoie aussi staffId
     onConfirm: (payload: { serviceId: string; dateTimeISO: string; staffId: string }) => void;
 };
 
 const BookingModal: React.FC<Props> = ({ open, service, initialStaffId, onClose, onConfirm }) => {
-    // jour sélectionné
     const [selectedDay, setSelectedDay] = useState(() => dayjs().startOf("day"));
-
-    // slot sélectionné
     const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
 
-    // liste des créneaux dispo
     const [slots, setSlots] = useState<AvailabilityItem[]>([]);
     const [loadingSlots, setLoadingSlots] = useState(false);
 
-    //  staff
     const [staff, setStaff] = useState<StaffItem[]>([]);
     const [loadingStaff, setLoadingStaff] = useState(false);
     const [staffId, setStaffId] = useState<string>("");
 
-    // reset quand service change
+    //  reset propre quand on ouvre/ferme ou change de service
     useEffect(() => {
+        if (!open) {
+            setSelectedDay(dayjs().startOf("day"));
+            setSelectedSlot(null);
+            setSlots([]);
+            setStaff([]);
+            setStaffId("");
+            return;
+        }
+
+        // quand le modal s’ouvre
         setSelectedDay(dayjs().startOf("day"));
         setSelectedSlot(null);
         setSlots([]);
-    }, [service?._id]);
+    }, [open, service?._id]);
 
-    //  charger la liste de coiffeurs quand modal s’ouvre
+    //  charger coiffeurs quand modal s’ouvre
     useEffect(() => {
         if (!open) return;
 
@@ -56,9 +58,7 @@ const BookingModal: React.FC<Props> = ({ open, service, initialStaffId, onClose,
                 const data = await getStaff();
                 setStaff(data);
 
-                // pré-sélection :
-                // - si initialStaffId existe et est dans la liste => on l’utilise
-                // - sinon on prend le premier coiffeur
+                // pré-sélection
                 const found = initialStaffId && data.some((s) => s._id === initialStaffId);
                 if (found) setStaffId(initialStaffId!);
                 else if (data.length > 0) setStaffId(data[0]._id);
@@ -77,7 +77,7 @@ const BookingModal: React.FC<Props> = ({ open, service, initialStaffId, onClose,
         return Array.from({ length: 7 }).map((_, i) => dayjs().add(i, "day").startOf("day"));
     }, []);
 
-    //  charger les dispos selon date + staffId
+    //  charger dispos selon date + staffId
     useEffect(() => {
         if (!open || !service) return;
         if (!staffId) return;
@@ -96,7 +96,7 @@ const BookingModal: React.FC<Props> = ({ open, service, initialStaffId, onClose,
                 setLoadingSlots(false);
             }
         })();
-    }, [open, service, selectedDay, staffId]);
+    }, [open, service?._id, selectedDay, staffId]);
 
     const handleConfirm = () => {
         if (!service || !selectedSlot || !staffId) return;
@@ -109,6 +109,9 @@ const BookingModal: React.FC<Props> = ({ open, service, initialStaffId, onClose,
     };
 
     if (!open || !service) return null;
+
+    //  affichage prix promo
+    const hasPromo = typeof service.priceFinal === "number" && service.priceFinal < service.price;
 
     return (
         <div className="client-modal__backdrop" onClick={onClose}>
@@ -124,17 +127,39 @@ const BookingModal: React.FC<Props> = ({ open, service, initialStaffId, onClose,
                     {/* Service */}
                     <div className="client-booking__service">
                         <div className="client-booking__name">{service.name}</div>
+
                         <div className="client-booking__meta">
                             <span className="client-pill">{service.category}</span>
-                            {typeof service.price === "number" && (
+
+                            {/*  Prix normal / promo */}
+                            {hasPromo ? (
+                                <>
+                  <span
+                      className="client-pill client-pill--soft"
+                      style={{ textDecoration: "line-through", opacity: 0.7 }}
+                  >
+                    {service.price} €
+                  </span>
+
+                                    <span className="client-pill client-pill--soft" style={{ fontWeight: 800 }}>
+                    {service.priceFinal} €
+                  </span>
+
+                                    <span className="client-pill" style={{ fontWeight: 800 }}>
+                    Promo
+                  </span>
+                                </>
+                            ) : (
                                 <span className="client-pill client-pill--soft">{service.price} €</span>
                             )}
                         </div>
                     </div>
 
-                    {/* ✅ COIFFEUR */}
+                    {/* Coiffeur */}
                     <div style={{ marginBottom: 12 }}>
-                        <div style={{ fontWeight: 700, marginBottom: 6, color: "#0f172a" }}>Choisir un coiffeur</div>
+                        <div style={{ fontWeight: 700, marginBottom: 6, color: "#0f172a" }}>
+                            Choisir un coiffeur
+                        </div>
 
                         {loadingStaff ? (
                             <p style={{ margin: 0, color: "#64748b" }}>Chargement de l’équipe…</p>

@@ -6,9 +6,10 @@ import dayjs from "dayjs";
 import { AuthenticatedRequest } from "../middlewares/auth.middleware";
 import { AppointmentModel } from "../models/appointment.model";
 import { ServiceModel } from "../models/service.model";
+import { findBestActivePromoForService } from "../utils/promotions";
 import { StaffModel } from "../models/staff.model";
 
-// ⚙ Génère les créneaux 09:00 → 18:00 toutes les 30 minutes
+//  Génère les créneaux 09:00 → 18:00 toutes les 30 minutes
 function buildSlotsForDay(dateISO: string) {
     const day = dayjs(dateISO).startOf("day");
     const slots: string[] = [];
@@ -83,52 +84,82 @@ function buildSlotsFromStaffSchedule(dateYYYYMMDD: string, staffDay: { start: st
 // Créer un RDV pour un client + une prestation + un coiffeur
 
 
+
+
+
 export async function createAppointment(req: AuthenticatedRequest, res: Response) {
-    if (!req.user) return res.status(401).json({ message: "Non authentifié." });
+    try {
+        if (!req.user) return res.status(401).json({ message: "Non authentifié." });
 
-    const { serviceId, dateTimeISO, staffId } = req.body as {
-        serviceId: string;
-        dateTimeISO: string;
-        staffId: string;
-    };
+        const { serviceId, dateTimeISO, staffId } = req.body as {
+            serviceId: string;
+            dateTimeISO: string;
+            staffId: string;
+        };
 
-    if (!serviceId || !dateTimeISO || !staffId) {
-        return res.status(400).json({ message: "serviceId, dateTimeISO et staffId sont requis." });
+        if (!serviceId || !dateTimeISO || !staffId) {
+            return res.status(400).json({ message: "serviceId, dateTimeISO et staffId sont requis." });
+        }
+
+        // 1) Charge la prestation
+        const service = await ServiceModel.findById(serviceId);
+        if (!service || !service.isActive) {
+            return res.status(404).json({ message: "Prestation introuvable ou inactive." });
+        }
+
+        // 2) Dates
+        const startAt = new Date(dateTimeISO);
+        if (Number.isNaN(startAt.getTime())) {
+            return res.status(400).json({ message: "dateTimeISO invalide." });
+        }
+
+        //  règle : pas de RDV dans le passé
+        if (dayjs(startAt).isBefore(dayjs())) {
+            return res.status(409).json({ message: "Impossible de réserver un créneau déjà passé." });
+        }
+
+        const endAt = dayjs(startAt).add(service.durationMinutes, "minute").toDate();
+
+        // 3) Conflit (même coiffeur / même startAt / booked)
+        const exists = await AppointmentModel.findOne({
+            status: "booked",
+            staffId,
+            startAt,
+        });
+
+        if (exists) {
+            return res.status(409).json({ message: "Créneau déjà réservé pour ce coiffeur." });
+        }
+
+        // 4)  Promo ( promo active)
+        const { promo, priceFinal } = await findBestActivePromoForService(service);
+
+        // 5) Création RDV + stockage pricePaid + promoApplied
+        const appt = await AppointmentModel.create({
+            userId: req.user.id,
+            serviceId,
+            staffId,
+            startAt,
+            endAt,
+            status: "booked",
+
+            pricePaid: priceFinal,
+
+            promoApplied: promo
+                ? {
+                    promoId: promo._id,
+                    name: promo.name,
+                    type: promo.type,
+                    value: promo.value,
+                }
+                : undefined,
+        });
+
+        return res.status(201).json(appt);
+    } catch (error) {
+        console.error("createAppointment error:", (error as Error).message);
+        return res.status(500).json({ message: "Erreur serveur (création RDV)." });
     }
-
-    const service = await ServiceModel.findById(serviceId);
-    if (!service || !service.isActive) {
-        return res.status(404).json({ message: "Prestation introuvable ou inactive." });
-    }
-
-    const startAt = new Date(dateTimeISO);
-    if (Number.isNaN(startAt.getTime())) {
-        return res.status(400).json({ message: "dateTimeISO invalide." });
-    }
-
-    const endAt = dayjs(startAt).add(service.durationMinutes, "minute").toDate();
-
-    //  conflit = même coiffeur + même startAt + booked
-    const exists = await AppointmentModel.findOne({
-        status: "booked",
-        staffId,
-        startAt,
-    });
-
-    if (exists) {
-        return res.status(409).json({ message: "Créneau déjà réservé pour ce coiffeur." });
-    }
-
-    const appt = await AppointmentModel.create({
-        userId: req.user.id,
-        serviceId,
-        staffId,
-        startAt,
-        endAt,
-        status: "booked",
-    });
-
-    return res.status(201).json(appt);
 }
 
 // GET /api/appointments?date=YYYY-MM-DD
@@ -158,33 +189,51 @@ export async function listAppointmentsForDay(req: AuthenticatedRequest, res: Res
 }
 
 
+// GET /api/appointments/availability?date=YYYY-MM-DD
 export async function getAvailability(req: AuthenticatedRequest, res: Response) {
-    const date = String(req.query.date || "");
-    const staffId = String(req.query.staffId || "");
+    const date = String(req.query.date || "").trim();
 
-    if (!date) return res.status(400).json({ message: "Paramètre 'date' requis (YYYY-MM-DD)." });
-    if (!staffId) return res.status(400).json({ message: "Paramètre 'staffId' requis." });
+    if (!date) {
+        return res.status(400).json({ message: "Paramètre 'date' requis (YYYY-MM-DD)." });
+    }
 
+    // Slots possibles
     const slots = buildSlotsForDay(date);
 
+    // Bornes de la journée
     const start = dayjs(date).startOf("day").toDate();
     const end = dayjs(date).endOf("day").toDate();
 
+    // RDV bookés ce jour
     const booked = await AppointmentModel.find({
         status: "booked",
-        staffId,
         startAt: { $gte: start, $lte: end },
     }).select("startAt");
 
     const bookedSet = new Set(booked.map((a) => a.startAt.toISOString()));
 
-    const response = slots.map((iso) => ({
-        dateTimeISO: iso,
-        available: !bookedSet.has(iso),
-    }));
+    // pour filtrer les heures passées si date = aujourd'hui
+    const now = dayjs();
+
+    const response = slots.map((iso) => {
+        const slotTime = dayjs(iso);
+
+        // 1) déjà réservé ?
+        const isBooked = bookedSet.has(iso);
+
+        // 2) slot passé ? (uniquement si on est sur la date du jour)
+        const isPast =
+            slotTime.isSame(now, "day") && slotTime.isBefore(now);
+
+        return {
+            dateTimeISO: iso,
+            available: !isBooked && !isPast,
+        };
+    });
 
     return res.json(response);
 }
+
 
 
 /**

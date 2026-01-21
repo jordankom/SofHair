@@ -225,7 +225,8 @@ const Rdvs: React.FC = () => {
             _id: rescheduleTarget.serviceId._id,
             name: rescheduleTarget.serviceId.name,
             category: rescheduleTarget.serviceId.category,
-            price: rescheduleTarget.serviceId.price,
+            price: rescheduleTarget.serviceId.price?? 0,
+            durationMinutes: rescheduleTarget.serviceId.durationMinutes ?? 30,
             imageUrl: rescheduleTarget.serviceId.imageUrl,
             description: rescheduleTarget.serviceId.description,
         };
