@@ -30,29 +30,30 @@ const OwnerStatsPage: React.FC = () => {
 
     useEffect(() => {
         refresh();
-
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Chart: transforme rdvPerDay en format affichable
     const chartBars = useMemo(() => {
         const items = data?.rdvPerDay ?? [];
-        // label court (DD/MM)
-        return items.map((x) => ({
+        // ✅ CHANGED: force count en number (au cas où l’API renvoie string / null)
+        return items.map((x: any) => ({
             label: dayjs(x.date).format("DD/MM"),
-            value: x.count,
+            value: Number(x.count ?? 0),
         }));
     }, [data]);
 
     // Pour calculer la hauteur max (pour un rendu joli)
     const maxValue = useMemo(() => {
-        const vals = chartBars.map((b) => b.value);
-        return vals.length ? Math.max(...vals) : 1;
+        // ✅ CHANGED: blindage (toujours >= 1)
+        const vals = chartBars.map((b) => Number(b.value ?? 0));
+        return vals.length ? Math.max(...vals, 1) : 1;
     }, [chartBars]);
 
     // KPI formatés
     const revenueLabel = useMemo(() => {
         const v = data?.kpis.revenue ?? 0;
-        return `${v.toFixed(0)} €`;
+        return `${Number(v).toFixed(0)} €`; // ✅ CHANGED: ensure number
     }, [data]);
 
     return (
@@ -119,9 +120,7 @@ const OwnerStatsPage: React.FC = () => {
 
                             <article className="owner-stats__kpi-card">
                                 <p className="owner-stats__kpi-label">Top prestation</p>
-                                <p className="owner-stats__kpi-value">
-                                    {data.topServices[0]?.name ?? "—"}
-                                </p>
+                                <p className="owner-stats__kpi-value">{data.topServices[0]?.name ?? "—"}</p>
                                 <span className="owner-stats__kpi-badge">
                   {data.topServices[0] ? `${data.topServices[0].count} RDV` : "Aucune donnée"}
                 </span>
@@ -134,7 +133,9 @@ const OwnerStatsPage: React.FC = () => {
                             <article className="owner-stats__card owner-stats__card--chart">
                                 <div className="owner-stats__card-header">
                                     <h2>Rendez-vous par jour</h2>
-                                    <p>Période : {data.range.from} → {data.range.to}</p>
+                                    <p>
+                                        Période : {data.range.from} → {data.range.to}
+                                    </p>
                                 </div>
 
                                 <div className="owner-stats__chart">
@@ -142,13 +143,17 @@ const OwnerStatsPage: React.FC = () => {
                                         <p style={{ color: "#64748b" }}>Aucune donnée sur cette période.</p>
                                     ) : (
                                         chartBars.map((b) => {
-                                            const heightPct = Math.round((b.value / maxValue) * 100);
+                                            // ✅ CHANGED: clamp + blindage pour éviter NaN/Infinity
+                                            const safeValue = Number.isFinite(b.value) ? b.value : 0;
+                                            const heightPct =
+                                                maxValue > 0 ? Math.round((safeValue / maxValue) * 100) : 0;
+
                                             return (
                                                 <div key={b.label} className="owner-stats__chart-bar">
                                                     <div
                                                         className="owner-stats__chart-bar-fill"
-                                                        style={{ height: `${heightPct}%` }}
-                                                        title={`${b.value} RDV`}
+                                                        style={{ height: `${Math.max(0, Math.min(100, heightPct))}%` }} // ✅ CHANGED
+                                                        title={`${safeValue} RDV`}
                                                     />
                                                     <span className="owner-stats__chart-bar-label">{b.label}</span>
                                                 </div>
@@ -175,7 +180,9 @@ const OwnerStatsPage: React.FC = () => {
                                                 data.topServices.map((s) => (
                                                     <li key={s.serviceId}>
                                                         <span>{s.name}</span>
-                                                        <span className="muted">{s.count} rdv • {s.revenue.toFixed(0)}€</span>
+                                                        <span className="muted">
+                              {s.count} rdv • {Number(s.revenue ?? 0).toFixed(0)}€ {/* ✅ CHANGED */}
+                            </span>
                                                     </li>
                                                 ))
                                             )}
@@ -190,7 +197,9 @@ const OwnerStatsPage: React.FC = () => {
                                             ) : (
                                                 data.topStaff.map((s) => (
                                                     <li key={s.staffId}>
-                                                        <span>{s.firstName} {s.lastName}</span>
+                            <span>
+                              {s.firstName} {s.lastName}
+                            </span>
                                                         <span className="muted">{s.count} rdv</span>
                                                     </li>
                                                 ))

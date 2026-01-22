@@ -52,8 +52,8 @@ const RegisterPage: React.FC = () => {
             // On connecte directement l'utilisateur après inscription
             login(res.token, res.user);
 
-            // Comme c'est un client, on l'envoie sur /client
-            navigate('/client', { replace: true });
+            // Comme c'est un client, on l'envoie sur client
+            navigate('/', { replace: true });
         } catch (err: any) {
             console.error('Erreur register :', err);
 
