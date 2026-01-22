@@ -5,17 +5,26 @@ import { AuthenticatedRequest } from "../middlewares/auth.middleware";
 import { UserModel } from "../models/user.model";
 import { AppointmentModel } from "../models/appointment.model";
 
-/**
- * GET /api/owner/clients
- * Liste des clients + stats RDV (total / annulés / reportés)
- */
+//  helper pour remplir tous les jours de la période
+function buildDayBuckets(from: string, to: string) {
+    const start = dayjs(from).startOf("day");
+    const end = dayjs(to).startOf("day");
+
+    const days: { date: string; count: number }[] = [];
+    let cur = start;
+
+    // inclusif
+    while (cur.isBefore(end) || cur.isSame(end, "day")) {
+        days.push({ date: cur.format("YYYY-MM-DD"), count: 0 });
+        cur = cur.add(1, "day");
+    }
+    return days;
+}
+
 export async function listClientsStats(req: AuthenticatedRequest, res: Response) {
     try {
-        // sécurité déjà gérée par requireAuth + requireOwner
         const clients = await UserModel.aggregate([
             { $match: { role: "client" } },
-
-            // jointure sur appointments
             {
                 $lookup: {
                     from: "appointments",
@@ -24,12 +33,9 @@ export async function listClientsStats(req: AuthenticatedRequest, res: Response)
                     as: "appts",
                 },
             },
-
-            // stats demandées
             {
                 $addFields: {
                     totalAppointments: { $size: "$appts" },
-
                     cancelledCount: {
                         $size: {
                             $filter: {
@@ -39,8 +45,6 @@ export async function listClientsStats(req: AuthenticatedRequest, res: Response)
                             },
                         },
                     },
-
-                    // reporté = somme des rescheduleCount (si un RDV est reporté 3 fois => +3)
                     rescheduledCount: {
                         $sum: {
                             $map: {
@@ -52,7 +56,6 @@ export async function listClientsStats(req: AuthenticatedRequest, res: Response)
                     },
                 },
             },
-
             {
                 $project: {
                     passwordHash: 0,
@@ -60,7 +63,6 @@ export async function listClientsStats(req: AuthenticatedRequest, res: Response)
                     __v: 0,
                 },
             },
-
             { $sort: { lastName: 1, firstName: 1 } },
         ]);
 
@@ -71,15 +73,6 @@ export async function listClientsStats(req: AuthenticatedRequest, res: Response)
     }
 }
 
-/**
- * GET /api/owner/stats?from=YYYY-MM-DD&to=YYYY-MM-DD
- * ✅ booked uniquement (non annulés)
- * Renvoie tout ce qu’il faut pour la page Stats en 1 call :
- * - kpis (CA, rdv, reports)
- * - rdvPerDay (graph)
- * - topServices
- * - topStaff
- */
 export async function getOwnerStats(req: AuthenticatedRequest, res: Response) {
     try {
         const from = String(req.query.from || "").trim();
@@ -89,7 +82,6 @@ export async function getOwnerStats(req: AuthenticatedRequest, res: Response) {
             return res.status(400).json({ message: "from et to sont requis (YYYY-MM-DD)." });
         }
 
-        // bornes inclusives (du début de journée "from" à fin de journée "to")
         const start = dayjs(from).startOf("day");
         const end = dayjs(to).endOf("day");
 
@@ -97,20 +89,13 @@ export async function getOwnerStats(req: AuthenticatedRequest, res: Response) {
             return res.status(400).json({ message: "Dates invalides. Format attendu: YYYY-MM-DD." });
         }
 
-        // Pipeline commun : booked uniquement + plage de dates
         const baseMatch = {
             status: "booked",
             startAt: { $gte: start.toDate(), $lte: end.toDate() },
         };
 
-        /**
-         * 1) KPI + agrégations (CA / count / total reports)
-         * On lookup service pour récupérer price.
-         */
         const kpiAgg = await AppointmentModel.aggregate([
             { $match: baseMatch },
-
-            // join service pour price
             {
                 $lookup: {
                     from: "services",
@@ -121,10 +106,12 @@ export async function getOwnerStats(req: AuthenticatedRequest, res: Response) {
             },
             { $unwind: "$service" },
 
-            // calc safe
+            //  utilise pricePaid si présent (plus fiable), sinon service.price
             {
                 $addFields: {
-                    servicePrice: { $ifNull: ["$service.price", 0] },
+                    effectivePrice: {
+                        $ifNull: ["$pricePaid", { $ifNull: ["$service.price", 0] }],
+                    },
                     resCount: { $ifNull: ["$rescheduleCount", 0] },
                 },
             },
@@ -133,52 +120,36 @@ export async function getOwnerStats(req: AuthenticatedRequest, res: Response) {
                 $group: {
                     _id: null,
                     totalAppointments: { $sum: 1 },
-                    revenue: { $sum: "$servicePrice" },
+                    revenue: { $sum: "$effectivePrice" },
                     totalReschedules: { $sum: "$resCount" },
                 },
             },
-
-            {
-                $project: {
-                    _id: 0,
-                    totalAppointments: 1,
-                    revenue: 1,
-                    totalReschedules: 1,
-                },
-            },
+            { $project: { _id: 0, totalAppointments: 1, revenue: 1, totalReschedules: 1 } },
         ]);
 
         const kpis = kpiAgg[0] || { totalAppointments: 0, revenue: 0, totalReschedules: 0 };
 
-        /**
-         * 2) RDV par jour (graph)
-         * Group by YYYY-MM-DD
-         */
         const perDayAgg = await AppointmentModel.aggregate([
             { $match: baseMatch },
             {
                 $group: {
-                    _id: {
-                        $dateToString: { format: "%Y-%m-%d", date: "$startAt" },
-                    },
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$startAt" } },
                     count: { $sum: 1 },
                 },
             },
             { $sort: { _id: 1 } },
-            {
-                $project: {
-                    _id: 0,
-                    date: "$_id",
-                    count: 1,
-                },
-            },
+            { $project: { _id: 0, date: "$_id", count: 1 } },
         ]);
 
-        /**
-         * 3) Top prestations (booked uniquement)
-         * - count
-         * - revenue (sum price)
-         */
+        //fill days manquants -> pas de graphe "vide"
+        const buckets = buildDayBuckets(from, to);
+        const map = new Map<string, number>();
+        for (const d of perDayAgg) map.set(d.date, Number(d.count ?? 0));
+        const rdvPerDayFilled = buckets.map((b) => ({
+            date: b.date,
+            count: map.get(b.date) ?? 0,
+        }));
+
         const topServicesAgg = await AppointmentModel.aggregate([
             { $match: baseMatch },
             {
@@ -190,37 +161,30 @@ export async function getOwnerStats(req: AuthenticatedRequest, res: Response) {
                 },
             },
             { $unwind: "$service" },
+
+
             {
                 $addFields: {
-                    servicePrice: { $ifNull: ["$service.price", 0] },
+                    effectivePrice: {
+                        $ifNull: ["$pricePaid", { $ifNull: ["$service.price", 0] }],
+                    },
                 },
             },
+
             {
                 $group: {
                     _id: "$serviceId",
                     name: { $first: "$service.name" },
                     category: { $first: "$service.category" },
                     count: { $sum: 1 },
-                    revenue: { $sum: "$servicePrice" },
+                    revenue: { $sum: "$effectivePrice" },
                 },
             },
             { $sort: { count: -1 } },
             { $limit: 5 },
-            {
-                $project: {
-                    _id: 0,
-                    serviceId: "$_id",
-                    name: 1,
-                    category: 1,
-                    count: 1,
-                    revenue: 1,
-                },
-            },
+            { $project: { _id: 0, serviceId: "$_id", name: 1, category: 1, count: 1, revenue: 1 } },
         ]);
 
-        /**
-         * 4) Top coiffeurs (booked uniquement)
-         */
         const topStaffAgg = await AppointmentModel.aggregate([
             { $match: baseMatch },
             {
@@ -242,15 +206,7 @@ export async function getOwnerStats(req: AuthenticatedRequest, res: Response) {
             },
             { $sort: { count: -1 } },
             { $limit: 5 },
-            {
-                $project: {
-                    _id: 0,
-                    staffId: "$_id",
-                    firstName: 1,
-                    lastName: 1,
-                    count: 1,
-                },
-            },
+            { $project: { _id: 0, staffId: "$_id", firstName: 1, lastName: 1, count: 1 } },
         ]);
 
         return res.json({
@@ -260,9 +216,9 @@ export async function getOwnerStats(req: AuthenticatedRequest, res: Response) {
                 totalAppointments: kpis.totalAppointments,
                 totalReschedules: kpis.totalReschedules,
             },
-            rdvPerDay: perDayAgg,       // [{date:"2026-01-10", count: 4}, ...]
-            topServices: topServicesAgg, // [{name, count, revenue}, ...]
-            topStaff: topStaffAgg,       // [{firstName,lastName,count}, ...]
+            rdvPerDay: rdvPerDayFilled, // ✅ CHANGED
+            topServices: topServicesAgg,
+            topStaff: topStaffAgg,
         });
     } catch (error) {
         console.error("getOwnerStats error:", (error as Error).message);

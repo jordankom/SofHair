@@ -237,3 +237,46 @@
   color: #64748b;
   font-size: 0.85rem;
 }
+/* frontend/src/styles/pages/_ownerStats.scss */
+
+/* ✅ CHANGED: chart layout fiable (sinon barres invisibles) */
+.owner-stats__chart {
+  height: 260px;                /* hauteur visible du graph */
+  display: flex;
+  align-items: flex-end;        /* barres "posées" en bas */
+  gap: 10px;
+  padding: 14px 10px;
+  overflow-x: auto;
+}
+
+/* Chaque barre = colonne */
+.owner-stats__chart-bar {
+  min-width: 44px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+
+/*  la partie "fill" doit pouvoir prendre une hauteur % */
+.owner-stats__chart-bar-fill {
+  width: 100%;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(59, 130, 246, 0.95), rgba(99, 102, 241, 0.65));
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.15);
+  transition: height 0.2s ease;
+}
+
+/* Labels en bas */
+.owner-stats__chart-bar-label {
+  font-size: 12px;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+/* Optionnel: texte muted */
+.muted {
+  color: #64748b;
+}
